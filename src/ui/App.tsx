@@ -139,7 +139,7 @@ function App() {
           <div className="result-card-title">
             <div className="heading-with-orb">
               <span className="energy-orb"><TypeIcon type={selectedType} /></span>
-              <div><p className="section-kicker">INCOMING MOVES</p><h2 id="defense-title">Defending as {selectedType}</h2></div>
+              <div><p className="section-kicker">INCOMING MOVES</p><h2 id="defense-title">Defending</h2></div>
             </div>
           </div>
           <MultiplierRows matchups={singleDefense} label={`${selectedType} defensive matchups`} />
@@ -149,7 +149,7 @@ function App() {
           <div className="result-card-title">
             <div className="heading-with-orb">
               <span className="energy-orb"><TypeIcon type={selectedType} /></span>
-              <div><p className="section-kicker">YOUR MOVES</p><h2 id="offense-title">Strong against</h2></div>
+              <div><p className="section-kicker">YOUR MOVES</p><h2 id="offense-title">Attacking</h2></div>
             </div>
           </div>
           {offense.length > 0

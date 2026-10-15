@@ -28,20 +28,20 @@ describe('visual type lookup', () => {
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Fire type' }))
 
-    const offense = screen.getByRole('region', { name: 'Strong against' })
+    const offense = screen.getByRole('region', { name: 'Attacking' })
     expect(offense).toHaveClass('offense-card')
     expect(within(offense).getByText('Grass', { selector: '.type-result-name' })).toBeInTheDocument()
     expect(offense.querySelector('.count-badge')).toBeNull()
     const matchupSections = Array.from(document.querySelectorAll('.matchup-columns > section'))
     expect(matchupSections.map((section) => section.querySelector('h2')?.textContent))
-      .toEqual(['Defending as Fire', 'Strong against'])
+      .toEqual(['Defending', 'Attacking'])
     expect(within(offense).getByRole('group', { name: '½× damage' })).toBeInTheDocument()
     expect(within(offense).getByText('Water', { selector: '.type-result-name' })).toBeInTheDocument()
     expect(within(offense).getAllByText('2×', { selector: '.type-result strong' })[0]).toHaveClass('multiplier-2')
     expect(within(offense).getByText('Grass', { selector: '.type-result-name' }).closest('.type-result'))
       .toHaveClass('type-result-2x')
 
-    const defense = screen.getByRole('region', { name: 'Defending as Fire' })
+    const defense = screen.getByRole('region', { name: 'Defending' })
     expect(defense).toHaveClass('defense-card')
     const offenseHeader = offense.querySelector('.result-card-title') as HTMLElement
     const defenseHeader = defense.querySelector('.result-card-title') as HTMLElement
