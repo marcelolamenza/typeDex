@@ -11,7 +11,10 @@ describe('visual type lookup', () => {
     const index = screen.getByRole('region', { name: 'Choose your type.' })
     for (const type of POKEMON_TYPES) {
       const button = within(index).getByRole('button', { name: `${type} type` })
-      expect(button.querySelector('img')).toHaveAttribute('src', `/type-icons/${type.toLowerCase()}.svg`)
+      expect(button.querySelector('img')).toHaveAttribute(
+        'src',
+        `${import.meta.env.BASE_URL}type-icons/${type.toLowerCase()}.svg`,
+      )
     }
     expect(screen.queryByLabelText('Ruleset')).not.toBeInTheDocument()
   })

@@ -14,7 +14,7 @@ const MULTIPLIER_ORDER: readonly Multiplier[] = [4, 2, 0.5, 0.25, 0]
 
 function TypeIcon({ type, size = 'normal' }: { type: PokemonType; size?: 'normal' | 'large' }) {
   return <span className={`type-icon ${size}`} aria-hidden="true">
-    <img src={`/type-icons/${type.toLowerCase()}.svg`} alt="" />
+    <img src={`${import.meta.env.BASE_URL}type-icons/${type.toLowerCase()}.svg`} alt="" />
   </span>
 }
 
