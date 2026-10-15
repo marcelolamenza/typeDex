@@ -35,14 +35,14 @@ body::before {
   position: fixed;
   z-index: 0;
   pointer-events: none;
-  top: 88px;
+  top: 82px;
   right: auto;
   left: 50%;
-  width: 260px;
-  height: 260px;
+  width: 100vw;
+  height: 100vw;
   border: 10px solid #344a5012;
   border-radius: 50%;
-  opacity: .32;
+  opacity: .2;
   background:
     radial-gradient(circle at center, #fff 0 9%, #344a50 9.5% 12%, transparent 12.5%),
     linear-gradient(to bottom, transparent 0 44%, #344a50 44% 56%, transparent 56%),
@@ -77,7 +77,6 @@ h1 span { color: var(--red); }
 .type-icon img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .type-icon.large { width: 68px; height: 68px; border-radius: 20px; }
 .type-medallion { position: relative; display: inline-grid; flex: 0 0 auto; place-items: center; width: 44px; height: 44px; border: 3px solid #fff; border-radius: 50%; background: radial-gradient(circle, #fff 0 48%, #e5ebed 50%); box-shadow: 0 0 0 1px #bdc9cc, 0 3px 8px #42565c20; }
-.type-medallion::after { content: ''; position: absolute; inset: 3px; border: 1px solid #ffffffd9; border-radius: inherit; pointer-events: none; }
 .type-medallion .type-icon { width: 30px; height: 30px; }
 .type-medallion.large { width: 88px; height: 88px; border-width: 5px; background: radial-gradient(circle, #fff 0 42%, #eef2f2 43% 62%, #cbd5d8 63% 66%, #fff 67%); box-shadow: 0 0 0 1px #bdc9cc, 0 5px 14px #42565c24; }
 .type-medallion.large .type-icon.large { width: 62px; height: 62px; border-radius: 50%; }
@@ -104,14 +103,12 @@ h1 span { color: var(--red); }
 .defense-card .result-card-title { background: linear-gradient(100deg, #edf1f2, #dce4e6); }
 .heading-with-orb { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .energy-orb { position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 43px; height: 43px; border: 2px solid #fff; border-radius: 50%; background: radial-gradient(circle, #fff 0 39%, #dce4e6 40% 62%, #fff 63%); box-shadow: 0 0 0 1px #becacd, 0 3px 8px #44585d20; }
-.energy-orb::after { content: ''; position: absolute; inset: 3px; border: 1px solid #ffffffd9; border-radius: 50%; }
 .energy-orb .type-icon { width: 27px; height: 27px; }
 .offense-card .energy-orb { background: radial-gradient(circle, #fff 0 39%, #dceae0 40% 62%, #fff 63%); box-shadow: 0 0 0 1px #c8d8ce, 0 3px 8px #447a3c1c; }
 .defense-card .energy-orb { background: radial-gradient(circle, #fff 0 39%, #d9e3e5 40% 62%, #fff 63%); box-shadow: 0 0 0 1px #c3d0d3, 0 3px 8px #3965701c; }
 .dual-card .energy-orb { background: radial-gradient(circle, #fff 0 39%, #dce4e6 40% 62%, #fff 63%); }
 .dual-type-orbs { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; }
 .dual-card .partner-type-orb.empty { border-style: dashed; border-color: #bdc9cc; background: radial-gradient(circle, #f9fbfb 0 39%, #dce4e6 40% 62%, #f9fbfb 63%); box-shadow: 0 0 0 1px #c4d0d2, 0 3px 8px #44585d10; }
-.dual-card .partner-type-orb.empty::after { border-style: dashed; border-color: #bdc9cc; }
 .section-kicker { margin: 0 0 7px; color: #74858a; font-size: 9px; }
 h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .type-results { display: flex; flex-wrap: wrap; gap: 8px; }
