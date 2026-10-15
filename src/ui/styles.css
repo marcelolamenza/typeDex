@@ -35,18 +35,19 @@ body::before {
   position: fixed;
   z-index: 0;
   pointer-events: none;
-  top: -155px;
-  right: -85px;
-  width: 290px;
-  height: 290px;
+  top: 88px;
+  right: auto;
+  left: 50%;
+  width: 260px;
+  height: 260px;
   border: 10px solid #344a5012;
   border-radius: 50%;
-  opacity: .45;
+  opacity: .32;
   background:
     radial-gradient(circle at center, #fff 0 9%, #344a50 9.5% 12%, transparent 12.5%),
     linear-gradient(to bottom, transparent 0 44%, #344a50 44% 56%, transparent 56%),
     linear-gradient(to bottom, #aab7bb3b 0 50%, #ffffff70 50% 100%);
-  transform: rotate(-18deg);
+  transform: translateX(-50%);
 }
 
 button, select { font: inherit; }
