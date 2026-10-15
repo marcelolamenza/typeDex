@@ -61,7 +61,18 @@ describe('visual type lookup', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Ground type' }))
+    const emptyPair = screen.getByRole('img', { name: 'Ground; second type not selected' })
+    expect(emptyPair.querySelectorAll('.energy-orb')).toHaveLength(2)
+    expect(emptyPair.querySelector('.partner-type-orb')).toHaveClass('empty')
+    expect(emptyPair.querySelector('.partner-type-orb img')).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Rock type' }))
+    const selectedPair = screen.getByRole('img', { name: 'Ground and Rock' })
+    expect(selectedPair.querySelectorAll('.energy-orb')).toHaveLength(2)
+    expect(selectedPair.querySelector('.partner-type-orb')).toHaveClass('filled')
+    expect(selectedPair.querySelector('.partner-type-orb img')).toHaveAttribute(
+      'src',
+      `${import.meta.env.BASE_URL}type-icons/rock.svg`,
+    )
     const combined = screen.getByRole('group', { name: 'Ground and Rock combined defensive matchups' })
     expect(within(combined).queryByText('Psychic', { selector: '.type-result-name' })).not.toBeInTheDocument()
     expect(within(combined).getByRole('group', { name: '4× damage' })).toBeInTheDocument()

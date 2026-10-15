@@ -103,6 +103,9 @@ h1 span { color: var(--red); }
 .offense-card .energy-orb { background: radial-gradient(circle, #fff 0 39%, #dff1da 40% 62%, #fff 63%); box-shadow: 0 0 0 1px #cfe0c8, 0 3px 8px #447a3c1c; }
 .defense-card .energy-orb { background: radial-gradient(circle, #fff 0 39%, #dceef2 40% 62%, #fff 63%); box-shadow: 0 0 0 1px #cbdde1, 0 3px 8px #3965701c; }
 .dual-card .energy-orb { background: radial-gradient(circle, #fff 0 39%, #f7e4d9 40% 62%, #fff 63%); }
+.dual-type-orbs { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; }
+.dual-card .partner-type-orb.empty { border-style: dashed; border-color: #d9cebb; background: radial-gradient(circle, #fffdf8 0 39%, #eee8dc 40% 62%, #fffdf8 63%); box-shadow: 0 0 0 1px #e3dacc, 0 3px 8px #6b5c4010; }
+.dual-card .partner-type-orb.empty::after { border-style: dashed; border-color: #d9cebb; }
 .section-kicker { margin: 0 0 7px; color: #a66c5f; font-size: 9px; }
 h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .type-results { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -133,11 +136,6 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .partner-grid .type-tile { min-height: 74px; border-radius: 13px 13px 13px 6px; font-size: 10px; gap: 6px; padding: 8px 4px; }
 .partner-grid .type-icon { width: 27px; height: 27px; }
 .dual-results { border-top: 1px dashed #e4d9c9; margin-top: 19px; padding-top: 15px; }
-.dual-summary { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 11px; color: #46534c; font-size: 12px; font-weight: 800; }
-.dual-summary > span:not(.type-separator):not(.dual-summary-label) { display: inline-flex; align-items: center; gap: 6px; }
-.dual-summary .type-icon { width: 25px; height: 25px; }
-.type-separator { color: var(--red); font-weight: 900; }
-.dual-summary-label { margin-left: auto; color: #75827a; font-size: 10px; font-weight: 650; }
 
 @media (max-width: 800px) {
   .type-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
@@ -166,7 +164,6 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
   .heading-with-orb { gap: 8px; }
   .partner-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
   .partner-grid .type-tile { min-height: 67px; }
-  .dual-summary-label { width: 100%; margin-left: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

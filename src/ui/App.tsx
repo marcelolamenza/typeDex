@@ -137,7 +137,16 @@ function App() {
       <section className="dual-card" aria-labelledby="dual-title" aria-live="polite">
         <div className="result-card-title">
           <div className="heading-with-orb">
-            <span className="energy-orb"><TypeIcon type={partnerType ?? selectedType} /></span>
+            <span
+              className="dual-type-orbs"
+              role="img"
+              aria-label={partnerType ? `${selectedType} and ${partnerType}` : `${selectedType}; second type not selected`}
+            >
+              <span className="energy-orb"><TypeIcon type={selectedType} /></span>
+              <span className={`energy-orb partner-type-orb ${partnerType ? 'filled' : 'empty'}`}>
+                {partnerType && <TypeIcon type={partnerType} />}
+              </span>
+            </span>
             <div><p className="section-kicker">TEAM-UP</p><h2 id="dual-title">Add a second type</h2></div>
           </div>
           {partnerType && <button type="button" className="clear-partner" onClick={() => setPartnerType(null)}>Clear</button>}
@@ -147,12 +156,6 @@ function App() {
             selected={partnerType === type} onClick={() => setPartnerType(type)} />)}
         </div>
         {partnerType && <div className="dual-results">
-          <div className="dual-summary">
-            <span><TypeIcon type={selectedType} /> {selectedType}</span>
-            <span className="type-separator" aria-hidden="true">+</span>
-            <span><TypeIcon type={partnerType} /> {partnerType}</span>
-            <span className="dual-summary-label">Combined incoming damage</span>
-          </div>
           <MultiplierRows matchups={dualDefense} label={`${selectedType} and ${partnerType} combined defensive matchups`} />
         </div>}
       </section>
