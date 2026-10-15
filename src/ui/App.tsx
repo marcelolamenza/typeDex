@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { getMultiplier, getOffensiveTargets } from '../domain/effectiveness'
+import { useEffect, useState } from 'react'
+import { getMultiplier, getOffensiveMatchups } from '../domain/effectiveness'
 import { POKEMON_TYPES, type Multiplier, type PokemonType } from '../domain/types'
 
 const MULTIPLIER_LABEL: Record<Multiplier, string> = {
@@ -16,6 +16,14 @@ function TypeIcon({ type, size = 'normal' }: { type: PokemonType; size?: 'normal
   return <span className={`type-icon ${size}`} aria-hidden="true">
     <img src={`${import.meta.env.BASE_URL}type-icons/${type.toLowerCase()}.svg`} alt="" />
   </span>
+}
+
+function typeFromHistoryState(state: unknown): PokemonType | null {
+  if (typeof state !== 'object' || state === null || !('typeDex' in state)) return null
+  const type = (state as { typeDex?: { type?: unknown } }).typeDex?.type
+  return typeof type === 'string' && POKEMON_TYPES.includes(type as PokemonType)
+    ? type as PokemonType
+    : null
 }
 
 function TypeMedallion({ type, size = 'normal' }: { type: PokemonType; size?: 'normal' | 'large' }) {
@@ -62,19 +70,35 @@ function App() {
   const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
   const [partnerType, setPartnerType] = useState<PokemonType | null>(null)
 
+  useEffect(() => {
+    function handlePopState(event: PopStateEvent) {
+      setSelectedType(typeFromHistoryState(event.state))
+      setPartnerType(null)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   function openType(type: PokemonType) {
+    window.history.pushState({ typeDex: { type } }, '')
     setSelectedType(type)
     setPartnerType(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function returnToTypes() {
+    if (selectedType && typeFromHistoryState(window.history.state) === selectedType) {
+      window.history.back()
+      return
+    }
     setSelectedType(null)
     setPartnerType(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const offense = selectedType ? getOffensiveTargets(selectedType) : []
+  const offense = selectedType ? getOffensiveMatchups(selectedType) : []
   const singleDefense = selectedType
     ? POKEMON_TYPES.map((attackingType) => ({
       type: attackingType,
@@ -111,18 +135,6 @@ function App() {
       </div>
 
       <div className="matchup-columns">
-        <section className="result-card offense-card" aria-labelledby="offense-title" aria-live="polite">
-          <div className="result-card-title">
-            <div className="heading-with-orb">
-              <span className="energy-orb"><TypeIcon type={selectedType} /></span>
-              <div><p className="section-kicker">YOUR MOVES</p><h2 id="offense-title">Strong against</h2></div>
-            </div>
-          </div>
-          {offense.length > 0
-            ? <div className="type-results">{offense.map((type) => <TypeResult key={type} type={type} multiplier={2} />)}</div>
-            : <p className="empty-state">No single type takes double damage from {selectedType}.</p>}
-        </section>
-
         <section className="result-card defense-card" aria-labelledby="defense-title" aria-live="polite">
           <div className="result-card-title">
             <div className="heading-with-orb">
@@ -131,6 +143,18 @@ function App() {
             </div>
           </div>
           <MultiplierRows matchups={singleDefense} label={`${selectedType} defensive matchups`} />
+        </section>
+
+        <section className="result-card offense-card" aria-labelledby="offense-title" aria-live="polite">
+          <div className="result-card-title">
+            <div className="heading-with-orb">
+              <span className="energy-orb"><TypeIcon type={selectedType} /></span>
+              <div><p className="section-kicker">YOUR MOVES</p><h2 id="offense-title">Strong against</h2></div>
+            </div>
+          </div>
+          {offense.length > 0
+            ? <MultiplierRows matchups={offense} label={`${selectedType} offensive matchups`} />
+            : <p className="empty-state">No changed damage multipliers for {selectedType}.</p>}
         </section>
       </div>
 

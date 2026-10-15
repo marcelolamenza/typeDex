@@ -21,9 +21,21 @@ export function getOffensiveTargets(
   attackingType: PokemonType,
   generation: Generation = 9,
 ): PokemonType[] {
-  return getTypesForGeneration(generation).filter(
-    (defendingType) => getMultiplier(attackingType, [defendingType], generation) === 2,
-  )
+  return getOffensiveMatchups(attackingType, generation)
+    .filter(({ multiplier }) => multiplier === 2)
+    .map(({ type }) => type)
+}
+
+export function getOffensiveMatchups(
+  attackingType: PokemonType,
+  generation: Generation = 9,
+): { type: PokemonType; multiplier: Multiplier }[] {
+  return getTypesForGeneration(generation)
+    .map((defendingType) => ({
+      type: defendingType,
+      multiplier: getMultiplier(attackingType, [defendingType], generation),
+    }))
+    .filter(({ multiplier }) => multiplier !== 1)
 }
 
 export function getDefensiveMatchups(

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getTypesForGeneration, TYPE_CHARTS } from '../data/typeCharts'
 import { GENERATIONS, POKEMON_TYPES } from './types'
-import { getDefensiveMatchups, getDefensiveMatchupsForTypes, getMultiplier, getOffensiveTargets } from './effectiveness'
+import { getDefensiveMatchups, getDefensiveMatchupsForTypes, getMultiplier, getOffensiveMatchups, getOffensiveTargets } from './effectiveness'
 
 describe('explicit generation type charts', () => {
   it('has a complete square chart for every generation and valid multipliers in every cell', () => {
@@ -79,6 +79,14 @@ describe('effectiveness calculations', () => {
   it('lists only super-effective single defending types for offense', () => {
     expect(getOffensiveTargets('Electric')).toEqual(['Water', 'Flying'])
     expect(getOffensiveTargets('Fairy', 6)).toEqual(['Fighting', 'Dragon', 'Dark'])
+  })
+
+  it('returns all non-neutral offensive matchups, including resistances and immunities', () => {
+    const fireMatchups = getOffensiveMatchups('Fire')
+    expect(fireMatchups).toContainEqual({ type: 'Water', multiplier: 0.5 })
+    expect(fireMatchups).toContainEqual({ type: 'Rock', multiplier: 0.5 })
+    expect(fireMatchups).not.toContainEqual({ type: 'Normal', multiplier: 1 })
+    expect(getOffensiveMatchups('Normal')).toContainEqual({ type: 'Ghost', multiplier: 0 })
   })
 
   it('groups defensive matchups for single and dual types', () => {

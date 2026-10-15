@@ -1,11 +1,15 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { POKEMON_TYPES } from '../domain/types'
 import App from './App'
 import './styles.css'
 
 describe('visual type lookup', () => {
+  beforeEach(() => {
+    window.history.replaceState(null, '', window.location.href)
+  })
+
   it('shows all current types as accessible icon buttons with local official artwork', () => {
     render(<App />)
     const index = screen.getByRole('region', { name: 'Choose your type.' })
@@ -28,6 +32,11 @@ describe('visual type lookup', () => {
     expect(offense).toHaveClass('offense-card')
     expect(within(offense).getByText('Grass', { selector: '.type-result-name' })).toBeInTheDocument()
     expect(offense.querySelector('.count-badge')).toBeNull()
+    const matchupSections = Array.from(document.querySelectorAll('.matchup-columns > section'))
+    expect(matchupSections.map((section) => section.querySelector('h2')?.textContent))
+      .toEqual(['Defending as Fire', 'Strong against'])
+    expect(within(offense).getByRole('group', { name: '½× damage' })).toBeInTheDocument()
+    expect(within(offense).getByText('Water', { selector: '.type-result-name' })).toBeInTheDocument()
     expect(within(offense).getAllByText('2×', { selector: '.type-result strong' })[0]).toHaveClass('multiplier-2')
     expect(within(offense).getByText('Grass', { selector: '.type-result-name' }).closest('.type-result'))
       .toHaveClass('type-result-2x')
@@ -37,7 +46,7 @@ describe('visual type lookup', () => {
     const offenseHeader = offense.querySelector('.result-card-title') as HTMLElement
     const defenseHeader = defense.querySelector('.result-card-title') as HTMLElement
     expect(getComputedStyle(offenseHeader).height).toBe(getComputedStyle(defenseHeader).height)
-    expect(getComputedStyle(offense.querySelector('.type-results') as HTMLElement).marginTop).toBeFalsy()
+    expect(getComputedStyle(offense.querySelector('.multiplier-row') as HTMLElement).paddingTop).toBe('0px')
     expect(getComputedStyle(defense.querySelector('.multiplier-row') as HTMLElement).paddingTop).toBe('0px')
     const defensiveTypes = within(defense).getAllByText(/.+/, { selector: '.type-result-name' })
     expect(defensiveTypes).toHaveLength(9)
@@ -89,7 +98,20 @@ describe('visual type lookup', () => {
     render(<App />)
     await user.click(screen.getByRole('button', { name: 'Ghost type' }))
     await user.click(screen.getByRole('button', { name: /All types/ }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Choose your type.' })).toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Ghost type' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Choose your type.' })).toBeInTheDocument()
+  })
+
+  it('returns to all types when browser back is used from a detail screen', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Fire type' }))
+    expect(screen.getByRole('heading', { name: 'Fire' })).toBeInTheDocument()
+
+    window.history.back()
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Choose your type.' })).toBeInTheDocument()
+    })
   })
 })
