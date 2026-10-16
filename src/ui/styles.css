@@ -89,6 +89,7 @@ h1 span { color: var(--red); }
 .detail-hero { position: relative; display: flex; align-items: center; gap: 17px; margin: 0 0 20px; padding: 14px 18px; border: 2px solid #fff; border-radius: 23px; background: linear-gradient(115deg, #e9eeef, #dce3e5 62%, #cbd5d7); box-shadow: inset 0 0 0 1px #bdc9cc, 0 5px 17px #42565c14; }
 .detail-hero::after { content: ''; position: absolute; right: 94px; top: 0; bottom: 0; width: 1px; background: linear-gradient(transparent, #cbd6d8, transparent); }
 .detail-hero .section-kicker { margin-bottom: 5px; color: #6d8186; }
+.detail-hero h1, .result-card-title h2 { font-family: Impact, "Arial Black", sans-serif; font-style: italic; font-weight: 900; }
 .detail-hero h1 { font-size: 35px; margin: 0; letter-spacing: -1.2px; }
 
 .matchup-columns { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; align-items: stretch; }
@@ -99,7 +100,7 @@ h1 span { color: var(--red); }
 .offense-card { background: linear-gradient(145deg, #d4e5f2, #b8d1e3); box-shadow: inset 0 0 0 1px #a9c3d5, 0 10px 30px #326b9810; }
 .defense-card { background: linear-gradient(145deg, #f6e7e5, #edd3d1); box-shadow: inset 0 0 0 1px #dfc2c0, 0 10px 30px #984a4610; }
 .result-card-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: 58px; min-height: 58px; flex: 0 0 58px; margin: -3px -3px 9px; padding: 6px 9px; border: 1px solid #ffffffcf; border-radius: 14px; }
-.result-card-title h2 { font-size: clamp(15px, 1.7vw, 20px); white-space: nowrap; }
+.result-card-title h2 { font-size: clamp(15px, 1.7vw, 20px); letter-spacing: -.3px; white-space: nowrap; }
 .offense-card .result-card-title { background: linear-gradient(100deg, #e5f0f7, #d0e2ef); }
 .defense-card .result-card-title { background: linear-gradient(100deg, #faf0ef, #f1dfdd); }
 .heading-with-orb { display: flex; align-items: center; gap: 10px; min-width: 0; }
