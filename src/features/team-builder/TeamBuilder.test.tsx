@@ -102,6 +102,7 @@ describe('Team Builder page', () => {
     const pikachuCard = screen.getByRole('heading', { name: 'Pikachu' }).closest('.catalog-pokemon-card') as HTMLElement
     await user.click(within(pikachuCard).getByRole('button', { name: 'Add to team' }))
     const table = document.querySelector('.offensive-matchup-table') as HTMLTableElement
+    expect(table.closest('.analysis-panel')).toHaveClass('offensive-profile')
     for (const defendingType of ['Flying', 'Water']) {
       const row = Array.from(table.querySelectorAll('tbody tr')).find((item) => item.querySelector('th')?.textContent?.includes(defendingType)) as HTMLTableRowElement
       expect(within(row).getByRole('img', { name: 'Pikachu: Electric type attack, 2× type effectiveness' })).toBeInTheDocument()
@@ -124,7 +125,7 @@ describe('Team Builder page', () => {
     await user.type(search, '#130')
     const card = screen.getByRole('heading', { name: 'Gyarados' }).closest('.catalog-pokemon-card') as HTMLElement
     await user.click(within(card).getByRole('button', { name: 'Add to team' }))
-    const profileToggle = screen.getByRole('button', { name: 'Minimize profile' })
+    const profileToggle = document.querySelector('button[aria-controls="team-analysis-content"]') as HTMLButtonElement
     await user.click(profileToggle)
     expect(screen.getByRole('button', { name: 'Expand profile' })).toHaveAttribute('aria-expanded', 'false')
     expect(document.getElementById('team-analysis-content')).toHaveAttribute('hidden')
@@ -142,6 +143,7 @@ describe('Team Builder page', () => {
     expect(within(table).queryByRole('columnheader', { name: '1×' })).not.toBeInTheDocument()
     const fireRow = Array.from(table.querySelectorAll('tbody tr')).find((row) => row.querySelector('th')?.textContent?.includes('Fire')) as HTMLTableRowElement
     expect(within(fireRow).getByRole('img', { name: 'Gyarados: ½× damage from Fire' })).toBeInTheDocument()
+    expect(fireRow.querySelector('.multiplier-0-5')).toBeInTheDocument()
   })
 
   it('restores the team after remounting the page', async () => {
