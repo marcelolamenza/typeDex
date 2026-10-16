@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Generation, Multiplier, PokemonType } from '../../domain/types'
+import { POKEMON_TYPES, type Generation, type Multiplier, type PokemonType } from '../../domain/types'
 import { analyzePokemon, analyzeTeam } from './analysis/analysis'
 import { CATALOG_PAGE_SIZE, filterPokemon, POKEMON_CATALOG, type Pokemon } from './catalog'
 import { addPokemon, createEmptyTeam, removePokemon, selectedPokemon, TEAM_SIZE, type Team } from './selection'
@@ -56,6 +56,7 @@ export default function TeamBuilder() {
   const [team, setTeam] = useState<Team>(loadBrowserTeam)
   const [query, setQuery] = useState('')
   const [generation, setGeneration] = useState<Generation | 'all'>('all')
+  const [typeFilters, setTypeFilters] = useState<[PokemonType | 'all', PokemonType | 'all']>(['all', 'all'])
   const [page, setPage] = useState(1)
   const [replaceIndex, setReplaceIndex] = useState<number | null>(null)
   const [catalogCollapsed, setCatalogCollapsed] = useState(false)
@@ -63,16 +64,22 @@ export default function TeamBuilder() {
   const selection = useMemo(() => selectedPokemon(team, POKEMON_CATALOG), [team])
   const roster = selection.filter((pokemon): pokemon is Pokemon => pokemon !== null)
   const selectedIds = new Set(team.filter((id): id is number => id !== null))
-  const filtered = useMemo(() => filterPokemon(POKEMON_CATALOG, query, generation), [query, generation])
+  const activeTypes = useMemo(() => typeFilters.filter((type): type is PokemonType => type !== 'all'), [typeFilters])
+  const filtered = useMemo(() => filterPokemon(POKEMON_CATALOG, query, generation, activeTypes), [query, generation, activeTypes])
   const visible = filtered.slice(0, page * CATALOG_PAGE_SIZE)
   const report = useMemo(() => analyzeTeam(roster), [roster])
   const totalSelected = roster.length
 
   useEffect(() => saveBrowserTeam(team), [team])
 
-  function updateFilters(nextQuery: string, nextGeneration: Generation | 'all') {
+  function updateFilters(
+    nextQuery: string,
+    nextGeneration: Generation | 'all',
+    nextTypeFilters: [PokemonType | 'all', PokemonType | 'all'] = typeFilters,
+  ) {
     setQuery(nextQuery)
     setGeneration(nextGeneration)
+    setTypeFilters(nextTypeFilters)
     setPage(1)
   }
 
@@ -131,7 +138,9 @@ export default function TeamBuilder() {
         <div className="catalog-filters">
           <label className="search-control"><span className="visually-hidden">Search Pokémon by name or Pokédex number</span><span aria-hidden="true">⌕</span><input value={query} onChange={(event) => updateFilters(event.target.value, generation)} placeholder="Search name or Pokédex number" /></label>
           <label className="generation-control"><span className="visually-hidden">Filter by generation</span><select value={generation} onChange={(event) => updateFilters(query, event.target.value === 'all' ? 'all' : Number(event.target.value) as Generation)}><option value="all">All generations</option>{Object.entries(GENERATION_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          {(query || generation !== 'all') && <button className="clear-filters" onClick={() => updateFilters('', 'all')}>Clear filters</button>}
+          <label className="type-control"><span className="visually-hidden">Filter by first type</span><select value={typeFilters[0]} onChange={(event) => { const nextType = POKEMON_TYPES.find((type) => type === event.target.value) ?? 'all'; updateFilters(query, generation, [nextType, typeFilters[1]]) }}><option value="all">Any first type</option>{POKEMON_TYPES.map((type) => <option key={type} value={type} disabled={typeFilters[1] === type}>{type}</option>)}</select></label>
+          <label className="type-control"><span className="visually-hidden">Filter by second type</span><select value={typeFilters[1]} onChange={(event) => { const nextType = POKEMON_TYPES.find((type) => type === event.target.value) ?? 'all'; updateFilters(query, generation, [typeFilters[0], nextType]) }}><option value="all">Any second type</option>{POKEMON_TYPES.map((type) => <option key={type} value={type} disabled={typeFilters[0] === type}>{type}</option>)}</select></label>
+          {(query || generation !== 'all' || activeTypes.length > 0) && <button className="clear-filters" onClick={() => updateFilters('', 'all', ['all', 'all'])}>Clear filters</button>}
         </div>
         <p className="catalog-help" aria-live="polite">{replaceIndex !== null ? `Choose a Pokémon to replace slot ${replaceIndex + 1}.` : totalSelected === TEAM_SIZE ? 'Choose Replace on a team slot to swap a Pokémon.' : 'Select a Pokémon to add it to the next open slot.'}</p>
         {notice && <p className="team-notice" role="status">{notice}</p>}

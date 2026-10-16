@@ -15,4 +15,10 @@ describe('Pokémon catalog', () => {
     expect(filterPokemon(POKEMON_CATALOG, 'char', 1).map(({ name }) => name)).toEqual(['Charmander', 'Charmeleon', 'Charizard'])
     expect(filterPokemon(POKEMON_CATALOG, 'char', 2)).toEqual([])
   })
+
+  it('combines generation and multiple required types', () => {
+    expect(filterPokemon(POKEMON_CATALOG, '', 1, ['Fire', 'Flying']).map(({ name }) => name)).toEqual(['Charizard', 'Moltres'])
+    expect(filterPokemon(POKEMON_CATALOG, '', 4, ['Fire', 'Electric'])).toEqual([])
+    expect(filterPokemon(POKEMON_CATALOG, 'char', 1, ['Fire', 'Flying']).map(({ name }) => name)).toEqual(['Charizard'])
+  })
 })

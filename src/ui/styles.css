@@ -233,8 +233,8 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .search-control { display: flex; min-width: 190px; flex: 1; align-items: center; gap: 8px; border: 1px solid #bdc9cc; border-radius: 11px; background: #fff; padding: 0 11px; color: #6d7e82; }
 .search-control > span:not(.visually-hidden) { font-size: 19px; }
 .search-control input { width: 100%; min-height: 41px; border: 0; outline: 0; background: transparent; color: #344a50; font: inherit; font-size: 12px; }
-.search-control:focus-within, .generation-control:focus-within { outline: 3px solid #71868b; outline-offset: 2px; }
-.generation-control select { min-height: 43px; max-width: 260px; border: 1px solid #bdc9cc; border-radius: 11px; background: #fff; padding: 0 32px 0 10px; color: #4d6064; font-size: 11px; }
+.search-control:focus-within, .generation-control:focus-within, .type-control:focus-within { outline: 3px solid #71868b; outline-offset: 2px; }
+.generation-control select, .type-control select { min-height: 43px; max-width: 260px; border: 1px solid #bdc9cc; border-radius: 11px; background: #fff; padding: 0 32px 0 10px; color: #4d6064; font-size: 11px; }
 .catalog-help { margin: 10px 0 7px; color: #748388; font-size: 10px; }
 .team-notice { margin: 0 0 10px; color: #456b56; font-size: 11px; }
 .pokemon-catalog-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 9px; }
@@ -243,9 +243,9 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .catalog-card-heading { display: flex; width: 100%; justify-content: space-between; color: #839195; font-size: 8px; font-weight: 800; }
 .catalog-pokemon-card .pokemon-art { flex-basis: 62px; width: 62px; height: 62px; margin: 2px 0; }
 .catalog-pokemon-card h3 { overflow: hidden; width: 100%; margin: 2px 0 5px; color: #344a50; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.catalog-pokemon-card .team-type-list { min-height: 21px; justify-content: center; }
+.catalog-pokemon-card .team-type-list { min-height: 32px; align-content: flex-start; justify-content: center; }
 .catalog-pokemon-card .team-type-badge { font-size: 8px; }
-.catalog-add-button { width: 100%; min-height: 28px; margin-top: 6px; border: 1px solid #bac8cb; border-radius: 8px; background: #f8fafb; color: #43575b; font-size: 9px; font-weight: 850; cursor: pointer; }
+.catalog-add-button { width: 100%; min-height: 28px; margin-top: auto; border: 1px solid #bac8cb; border-radius: 8px; background: #f8fafb; color: #43575b; font-size: 9px; font-weight: 850; cursor: pointer; }
 .catalog-add-button:not(:disabled):hover { border-color: #758b90; background: #fff; }
 .catalog-add-button:disabled { color: #72827d; opacity: .8; cursor: default; }
 .catalog-pokemon-card.is-selected .catalog-add-button { border-color: #bad2c0; background: #e1efe4; }
@@ -273,7 +273,7 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .report-strong { background: linear-gradient(145deg, #eff7ef, #e2eee4); }
 .report-gap { background: linear-gradient(145deg, #f7f1e8, #efe6d8); }
 .double-weakness-note { margin: 12px 0; border-left: 3px solid #ad3940; border-radius: 0 9px 9px 0; background: #f8e9e7; padding: 9px 11px; color: #79383a; font-size: 11px; line-height: 1.5; }
-.coverage-table-wrap { overflow-x: auto; margin: 12px 0 18px; border: 1px solid #cfd8d6; border-radius: 12px; background: #f9fbfa; }
+.coverage-table-wrap { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; margin: 12px 0 18px; border: 1px solid #cfd8d6; border-radius: 12px; background: #f9fbfa; }
 .coverage-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 10px; }
 .coverage-table caption { padding: 10px; color: #748181; font-size: 10px; text-align: left; }
 .coverage-table th, .coverage-table td { border-top: 1px solid #e1e6e4; padding: 6px 5px; }
@@ -349,7 +349,7 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
   .empty-slot-copy { min-height: 90px; }
   .catalog-filters { align-items: stretch; flex-direction: column; }
   .catalog-heading-actions { align-items: flex-end; flex-direction: column; }
-  .generation-control select { width: 100%; max-width: none; }
+  .generation-control select, .type-control select { width: 100%; max-width: none; }
   .clear-filters { align-self: flex-start; }
   .pokemon-catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
   .catalog-pokemon-card { padding: 6px 5px; }

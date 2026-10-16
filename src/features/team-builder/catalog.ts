@@ -13,12 +13,18 @@ export type Pokemon = {
 export const POKEMON_CATALOG = pokemonData as Pokemon[]
 export const CATALOG_PAGE_SIZE = 48
 
-export function filterPokemon(catalog: readonly Pokemon[], query: string, generation: Generation | 'all'): Pokemon[] {
+export function filterPokemon(
+  catalog: readonly Pokemon[],
+  query: string,
+  generation: Generation | 'all',
+  types: readonly PokemonType[] = [],
+): Pokemon[] {
   const normalized = query.trim().toLocaleLowerCase()
   const dexNumberQuery = normalized.replace(/^#/, '')
   const isDexNumber = /^\d+$/.test(dexNumberQuery)
   return catalog.filter((pokemon) => {
     if (generation !== 'all' && pokemon.generation !== generation) return false
+    if (!types.every((type) => pokemon.types.includes(type))) return false
     if (!normalized) return true
     return isDexNumber
       ? pokemon.dexNumber === Number(dexNumberQuery)

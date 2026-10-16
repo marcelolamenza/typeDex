@@ -36,6 +36,22 @@ describe('Team Builder page', () => {
     expect(within(analysis).getByText('Double weaknesses')).toBeInTheDocument()
   })
 
+  it('combines generation and both selected types in the catalog', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Pokémon catalog' }, { timeout: 5000 })
+    await user.type(screen.getByRole('textbox', { name: 'Search Pokémon by name or Pokédex number' }), 'char')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filter by generation' }), '1')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filter by first type' }), 'Fire')
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filter by second type' }), 'Flying')
+    expect(screen.getByRole('heading', { name: 'Charizard' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Charmander' })).not.toBeInTheDocument()
+    expect(screen.getByText('1 results')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Clear filters' }))
+    expect(screen.getByRole('combobox', { name: 'Filter by first type' })).toHaveValue('all')
+    expect(screen.getByRole('combobox', { name: 'Filter by second type' })).toHaveValue('all')
+  })
+
   it('prevents a seventh member, supports replacing and removing, and survives a broken image', async () => {
     const user = userEvent.setup()
     render(<App />)
