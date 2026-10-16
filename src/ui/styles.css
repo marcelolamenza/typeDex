@@ -229,12 +229,22 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .catalog-toggle:hover { border-color: #85989c; background: #fff; }
 .catalog-toggle:focus-visible { outline: 3px solid #6d858a; outline-offset: 2px; }
 .catalog-count { border-radius: 999px; background: #f4f7f8; padding: 7px 10px; color: #67787c; font-size: 10px; font-weight: 800; }
-.catalog-filters { display: flex; align-items: center; gap: 8px; }
+.catalog-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .search-control { display: flex; min-width: 190px; flex: 1; align-items: center; gap: 8px; border: 1px solid #bdc9cc; border-radius: 11px; background: #fff; padding: 0 11px; color: #6d7e82; }
 .search-control > span:not(.visually-hidden) { font-size: 19px; }
 .search-control input { width: 100%; min-height: 41px; border: 0; outline: 0; background: transparent; color: #344a50; font: inherit; font-size: 12px; }
-.search-control:focus-within, .generation-control:focus-within, .type-control:focus-within { outline: 3px solid #71868b; outline-offset: 2px; }
-.generation-control select, .type-control select { min-height: 43px; max-width: 260px; border: 1px solid #bdc9cc; border-radius: 11px; background: #fff; padding: 0 32px 0 10px; color: #4d6064; font-size: 11px; }
+.search-control:focus-within, .generation-control:focus-within { outline: 3px solid #71868b; outline-offset: 2px; }
+.generation-control select { min-height: 43px; max-width: 260px; border: 1px solid #bdc9cc; border-radius: 11px; background: #fff; padding: 0 32px 0 10px; color: #4d6064; font: inherit; font-size: 12px; }
+.type-filter-control { flex: 1 0 100%; min-width: 0; margin: 3px 0 0; border: 0; padding: 0; }
+.type-filter-control legend { margin-bottom: 6px; color: #526368; font-size: 11px; font-weight: 750; }
+.type-filter-control legend span { margin-left: 5px; color: #7b898d; font-size: 10px; font-weight: 500; }
+.type-filter-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(76px, 1fr)); gap: 5px; }
+.type-filter-option, .type-filter-any { display: inline-flex; min-width: 0; min-height: 34px; align-items: center; justify-content: center; gap: 4px; border: 1px solid #c7d0d2; border-radius: 9px; background: #f7f9f9; padding: 4px 6px; color: #4b5d61; font: inherit; font-size: 10px; font-weight: 650; cursor: pointer; }
+.type-filter-option img { width: 19px; height: 19px; flex: 0 0 auto; object-fit: contain; }
+.type-filter-option:hover:not(:disabled), .type-filter-any:hover { border-color: #87999d; background: #fff; }
+.type-filter-option.is-active, .type-filter-any[aria-pressed="true"] { border-color: #71868b; background: #e5ebec; color: #30464b; box-shadow: inset 0 0 0 1px #71868b; }
+.type-filter-option:disabled { opacity: .48; cursor: not-allowed; }
+.type-filter-option:focus-visible, .type-filter-any:focus-visible { outline: 3px solid #71868b; outline-offset: 2px; }
 .catalog-help { margin: 10px 0 7px; color: #748388; font-size: 10px; }
 .team-notice { margin: 0 0 10px; color: #456b56; font-size: 11px; }
 .pokemon-catalog-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 9px; }
@@ -349,7 +359,9 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
   .empty-slot-copy { min-height: 90px; }
   .catalog-filters { align-items: stretch; flex-direction: column; }
   .catalog-heading-actions { align-items: flex-end; flex-direction: column; }
-  .generation-control select, .type-control select { width: 100%; max-width: none; }
+  .generation-control, .generation-control select { width: 100%; max-width: none; }
+  .type-filter-options { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .type-filter-option, .type-filter-any { min-height: 37px; }
   .clear-filters { align-self: flex-start; }
   .pokemon-catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
   .catalog-pokemon-card { padding: 6px 5px; }

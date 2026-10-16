@@ -83,6 +83,12 @@ export default function TeamBuilder() {
     setPage(1)
   }
 
+  function toggleTypeFilter(type: PokemonType) {
+    const current = typeFilters.filter((value): value is PokemonType => value !== 'all')
+    const nextTypes = current.includes(type) ? current.filter((value) => value !== type) : [...current, type]
+    updateFilters(query, generation, [nextTypes[0] ?? 'all', nextTypes[1] ?? 'all'])
+  }
+
   function choosePokemon(pokemon: Pokemon) {
     if (selectedIds.has(pokemon.id)) return
     if (replaceIndex === null && totalSelected >= TEAM_SIZE) {
@@ -138,8 +144,13 @@ export default function TeamBuilder() {
         <div className="catalog-filters">
           <label className="search-control"><span className="visually-hidden">Search Pokémon by name or Pokédex number</span><span aria-hidden="true">⌕</span><input value={query} onChange={(event) => updateFilters(event.target.value, generation)} placeholder="Search name or Pokédex number" /></label>
           <label className="generation-control"><span className="visually-hidden">Filter by generation</span><select value={generation} onChange={(event) => updateFilters(query, event.target.value === 'all' ? 'all' : Number(event.target.value) as Generation)}><option value="all">All generations</option>{Object.entries(GENERATION_LABEL).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          <label className="type-control"><span className="visually-hidden">Filter by first type</span><select value={typeFilters[0]} onChange={(event) => { const nextType = POKEMON_TYPES.find((type) => type === event.target.value) ?? 'all'; updateFilters(query, generation, [nextType, typeFilters[1]]) }}><option value="all">Any first type</option>{POKEMON_TYPES.map((type) => <option key={type} value={type} disabled={typeFilters[1] === type}>{type}</option>)}</select></label>
-          <label className="type-control"><span className="visually-hidden">Filter by second type</span><select value={typeFilters[1]} onChange={(event) => { const nextType = POKEMON_TYPES.find((type) => type === event.target.value) ?? 'all'; updateFilters(query, generation, [typeFilters[0], nextType]) }}><option value="all">Any second type</option>{POKEMON_TYPES.map((type) => <option key={type} value={type} disabled={typeFilters[0] === type}>{type}</option>)}</select></label>
+          <fieldset className="type-filter-control">
+            <legend>Filter by type <span>Choose up to two</span></legend>
+            <div className="type-filter-options" role="group" aria-label="Filter catalog by Pokémon type">
+              <button className="type-filter-any" type="button" aria-pressed={activeTypes.length === 0} onClick={() => updateFilters(query, generation, ['all', 'all'])}>Any type</button>
+              {POKEMON_TYPES.map((type) => <button key={type} className={`type-filter-option type-${type.toLowerCase()} ${activeTypes.includes(type) ? 'is-active' : ''}`} type="button" aria-label={`Filter by ${type} type`} aria-pressed={activeTypes.includes(type)} disabled={activeTypes.length === 2 && !activeTypes.includes(type)} onClick={() => toggleTypeFilter(type)}><img src={typeIcon(type)} alt="" />{type}</button>)}
+            </div>
+          </fieldset>
           {(query || generation !== 'all' || activeTypes.length > 0) && <button className="clear-filters" onClick={() => updateFilters('', 'all', ['all', 'all'])}>Clear filters</button>}
         </div>
         <p className="catalog-help" aria-live="polite">{replaceIndex !== null ? `Choose a Pokémon to replace slot ${replaceIndex + 1}.` : totalSelected === TEAM_SIZE ? 'Choose Replace on a team slot to swap a Pokémon.' : 'Select a Pokémon to add it to the next open slot.'}</p>
