@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { getMultiplier, getOffensiveMatchups } from '../domain/effectiveness'
 import { POKEMON_TYPES, type Multiplier, type PokemonType } from '../domain/types'
+
+const TeamBuilder = lazy(() => import('../features/team-builder/TeamBuilder'))
 
 const MULTIPLIER_LABEL: Record<Multiplier, string> = {
   0: '0×', 0.25: '¼×', 0.5: '½×', 1: '1×', 2: '2×', 4: '4×',
@@ -66,7 +68,7 @@ function MultiplierRows({ matchups, label }: {
   </div>
 }
 
-function App() {
+function TypeDexPage() {
   const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
   const [partnerType, setPartnerType] = useState<PokemonType | null>(null)
 
@@ -117,6 +119,7 @@ function App() {
       <button type="button" className="brand" onClick={returnToTypes} aria-label="TypeDex, show all types">
         <span className="brand-mark" aria-hidden="true" /><span>TypeDex</span>
       </button>
+      <nav className="primary-nav" aria-label="Main navigation"><a className="active" href="#/" aria-current="page">Type Checker</a><a href="#/team-builder">Team Builder</a></nav>
     </header>
 
     {!selectedType ? <section className="type-index" aria-labelledby="index-title">
@@ -187,4 +190,14 @@ function App() {
   </main>
 }
 
-export default App
+export default function App() {
+  const [teamBuilder, setTeamBuilder] = useState(window.location.hash === '#/team-builder')
+  useEffect(() => {
+    const onRouteChange = () => setTeamBuilder(window.location.hash === '#/team-builder')
+    window.addEventListener('hashchange', onRouteChange)
+    return () => window.removeEventListener('hashchange', onRouteChange)
+  }, [])
+  return teamBuilder
+    ? <Suspense fallback={<main className="page-shell"><p className="loading-state" role="status">Loading Team Builder…</p></main>}><TeamBuilder /></Suspense>
+    : <TypeDexPage />
+}
