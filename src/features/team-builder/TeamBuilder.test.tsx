@@ -94,6 +94,20 @@ describe('Team Builder page', () => {
     expect(await screen.findByRole('heading', { name: 'Team Builder.' })).toBeInTheDocument()
   })
 
+  it('shows each Pokémon with super-effective STAB coverage against defending types', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Pokémon catalog' }, { timeout: 5000 })
+    await user.type(screen.getByRole('textbox', { name: 'Search Pokémon by name or Pokédex number' }), '#25')
+    const pikachuCard = screen.getByRole('heading', { name: 'Pikachu' }).closest('.catalog-pokemon-card') as HTMLElement
+    await user.click(within(pikachuCard).getByRole('button', { name: 'Add to team' }))
+    const table = document.querySelector('.offensive-matchup-table') as HTMLTableElement
+    for (const defendingType of ['Flying', 'Water']) {
+      const row = Array.from(table.querySelectorAll('tbody tr')).find((item) => item.querySelector('th')?.textContent?.includes(defendingType)) as HTMLTableRowElement
+      expect(within(row).getByRole('img', { name: 'Pikachu: Electric type attack, 2× type effectiveness' })).toBeInTheDocument()
+    }
+  })
+
   it('minimizes the catalog and presents a quieter defensive table without neutral or zero counts', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -110,11 +124,24 @@ describe('Team Builder page', () => {
     await user.type(search, '#130')
     const card = screen.getByRole('heading', { name: 'Gyarados' }).closest('.catalog-pokemon-card') as HTMLElement
     await user.click(within(card).getByRole('button', { name: 'Add to team' }))
+    const profileToggle = screen.getByRole('button', { name: 'Minimize profile' })
+    await user.click(profileToggle)
+    expect(screen.getByRole('button', { name: 'Expand profile' })).toHaveAttribute('aria-expanded', 'false')
+    expect(document.getElementById('team-analysis-content')).toHaveAttribute('hidden')
+    await user.click(screen.getByRole('button', { name: 'Expand profile' }))
+    const defensiveToggle = document.querySelector('button[aria-controls="defensive-coverage-content"]') as HTMLButtonElement
+    await user.click(defensiveToggle)
+    expect(document.getElementById('defensive-coverage-content')).toHaveAttribute('hidden')
+    await user.click(screen.getByRole('button', { name: 'Expand table' }))
+    const stabToggle = screen.getByRole('button', { name: 'Minimize' })
+    await user.click(stabToggle)
+    expect(document.getElementById('potential-stab-content')).toHaveAttribute('hidden')
+    await user.click(screen.getByRole('button', { name: 'Expand' }))
     const table = document.querySelector('.coverage-table') as HTMLTableElement
     expect(table.querySelectorAll('thead th')).toHaveLength(6)
     expect(within(table).queryByRole('columnheader', { name: '1×' })).not.toBeInTheDocument()
     const fireRow = Array.from(table.querySelectorAll('tbody tr')).find((row) => row.querySelector('th')?.textContent?.includes('Fire')) as HTMLTableRowElement
-    expect(Array.from(fireRow.querySelectorAll('td')).map((cell) => cell.querySelector('.visually-hidden') ? '' : cell.textContent)).toEqual(['', '', '1', '', ''])
+    expect(within(fireRow).getByRole('img', { name: 'Gyarados: ½× damage from Fire' })).toBeInTheDocument()
   })
 
   it('restores the team after remounting the page', async () => {

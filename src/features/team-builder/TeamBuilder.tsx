@@ -30,6 +30,13 @@ function PokemonImage({ pokemon, compact = false }: { pokemon: Pokemon; compact?
   </span>
 }
 
+function PokemonPortrait({ pokemon, description }: { pokemon: Pokemon; description: string }) {
+  const [failed, setFailed] = useState(false)
+  return <span className="coverage-portrait" role="img" aria-label={`${pokemon.name}: ${description}`} title={`${pokemon.name}: ${description}`}>
+    {failed ? pokemon.name.slice(0, 1) : <img src={pokemon.imageUrl} alt="" loading="lazy" decoding="async" width="30" height="30" onError={() => setFailed(true)} />}
+  </span>
+}
+
 function PokemonCard({ pokemon, selected, full, onAdd }: {
   pokemon: Pokemon; selected: boolean; full: boolean; onAdd: () => void
 }) {
@@ -60,6 +67,10 @@ export default function TeamBuilder() {
   const [page, setPage] = useState(1)
   const [replaceIndex, setReplaceIndex] = useState<number | null>(null)
   const [catalogCollapsed, setCatalogCollapsed] = useState(false)
+  const [analysisCollapsed, setAnalysisCollapsed] = useState(false)
+  const [coverageCollapsed, setCoverageCollapsed] = useState(false)
+  const [stabCollapsed, setStabCollapsed] = useState(false)
+  const [offenseCollapsed, setOffenseCollapsed] = useState(false)
   const [notice, setNotice] = useState('')
   const selection = useMemo(() => selectedPokemon(team, POKEMON_CATALOG), [team])
   const roster = selection.filter((pokemon): pokemon is Pokemon => pokemon !== null)
@@ -162,7 +173,8 @@ export default function TeamBuilder() {
     </section>
 
     <section className="analysis-panel" aria-labelledby="analysis-title">
-      <div className="analysis-heading"><p className="section-kicker">LIVE TEAM REPORT</p><h2 id="analysis-title">Defensive profile</h2><p>Type based coverage for the selected team. This does not account for abilities, held items, moves, or battle conditions.</p></div>
+      <div className="analysis-heading"><div className="analysis-heading-top"><div><p className="section-kicker">LIVE TEAM REPORT</p><h2 id="analysis-title">Defensive profile</h2></div><button className="analysis-section-toggle" type="button" aria-expanded={!analysisCollapsed} aria-controls="team-analysis-content" onClick={() => setAnalysisCollapsed((collapsed) => !collapsed)}>{analysisCollapsed ? 'Expand profile' : 'Minimize profile'}</button></div><p>Type based coverage for the selected team. This does not account for abilities, held items, moves, or battle conditions.</p></div>
+      <div id="team-analysis-content" hidden={analysisCollapsed}>
       {!totalSelected ? <div className="analysis-empty"><span aria-hidden="true">◉</span><strong>Your report is ready when your team is.</strong><p>Add a Pokémon to see shared weaknesses, resistances, immunities, and offensive coverage.</p></div> : <>
         <div className="report-highlights">
           <article className="report-card report-danger"><h3>Shared weaknesses</h3>{report.sharedWeaknesses.length ? <ul>{report.sharedWeaknesses.map(({ type, affected }) => <li key={type}><TypeBadge type={type} /><strong>{affected.length} members</strong><span>{affected.map(({ pokemon, multiplier }) => `${pokemon.name} (${MULTIPLIER_TEXT[multiplier]})`).join(', ')}</span></li>)}</ul> : <p>No shared weaknesses at the moment.</p>}</article>
@@ -170,15 +182,21 @@ export default function TeamBuilder() {
           <article className="report-card report-gap"><h3>Defensive gaps</h3>{report.defensiveGaps.length ? <ul>{report.defensiveGaps.map(({ type, affected }) => <li key={type}><TypeBadge type={type} /><span>{affected.map(({ pokemon, multiplier }) => `${pokemon.name} ${MULTIPLIER_TEXT[multiplier]}`).join(', ')}</span></li>)}</ul> : <p>No type currently threatens several members without a resistance or immunity elsewhere.</p>}</article>
         </div>
         {report.defensive.flatMap(({ affected, type }) => affected.filter(({ multiplier }) => multiplier === 4).map(({ pokemon }) => ({ type, pokemon }))).length > 0 && <p className="double-weakness-note"><strong>Double weaknesses:</strong> {report.defensive.flatMap(({ affected, type }) => affected.filter(({ multiplier }) => multiplier === 4).map(({ pokemon }) => `${pokemon.name} is 4× weak to ${type}`)).join('; ')}.</p>}
-        <div className="coverage-table-wrap"><table className="coverage-table"><caption>Defensive coverage by attacking type. Neutral 1× matches are omitted and zero counts are blank. Other counts show team members receiving that multiplier.</caption><thead><tr><th scope="col">Incoming type</th>{MULTIPLIERS.map((multiplier) => <th scope="col" key={multiplier}>{MULTIPLIER_TEXT[multiplier]}</th>)}</tr></thead><tbody>{report.defensive.map(({ type, counts }) => <tr key={type}><th scope="row"><TypeBadge type={type} /></th>{MULTIPLIERS.map((multiplier) => <td key={multiplier} className={`multiplier-${String(multiplier).replace('.', '-')}`}>{counts[multiplier] === 0 ? <span className="visually-hidden">0</span> : counts[multiplier]}</td>)}</tr>)}</tbody></table></div>
-        <section className="offensive-coverage" aria-labelledby="offensive-coverage-title"><div><p className="section-kicker">THEORETICAL TYPE BASED COVERAGE</p><h3 id="offensive-coverage-title">Potential STAB targets</h3><p>Based only on the selected Pokémon's types, assuming same type attacks. This does not confirm a Pokémon knows a move.</p></div>
-          <div className="offensive-coverage-list">{report.offensive.map(({ type, suppliedBy, targets }) => <div key={type} className="offensive-type-row"><div><TypeBadge type={type} /><span>{suppliedBy.map((pokemon) => pokemon.name).join(', ')}</span></div><div className="effectiveness-types">{targets.length ? targets.map((target) => <TypeBadge key={target} type={target} />) : <span className="neutral-note">No super-effective single type targets</span>}</div></div>)}</div></section>
+        <section className="coverage-section" aria-labelledby="defensive-coverage-title"><div className="coverage-section-heading"><div><p className="section-kicker">TEAM DEFENSE</p><h3 id="defensive-coverage-title">Defensive Type Coverage by Incoming Type</h3><p>Portraits show which team members receive each damage multiplier from the attacking type.</p></div><button className="analysis-section-toggle" type="button" aria-expanded={!coverageCollapsed} aria-controls="defensive-coverage-content" onClick={() => setCoverageCollapsed((collapsed) => !collapsed)}>{coverageCollapsed ? 'Expand table' : 'Minimize table'}</button></div>
+          <div id="defensive-coverage-content" hidden={coverageCollapsed}><div className="coverage-table-wrap"><table className="coverage-table"><caption>Incoming type effectiveness against each team member. Neutral 1× is omitted; an empty cell means no team members receive that multiplier.</caption><thead><tr><th scope="col">Attacking type</th>{MULTIPLIERS.map((multiplier) => <th scope="col" key={multiplier}>{MULTIPLIER_TEXT[multiplier]}</th>)}</tr></thead><tbody>{report.defensive.map(({ type, membersByMultiplier }) => <tr key={type}><th scope="row"><TypeBadge type={type} /></th>{MULTIPLIERS.map((multiplier) => <td key={multiplier} className={`multiplier-${String(multiplier).replace('.', '-')}`}>{membersByMultiplier[multiplier].length ? <div className="coverage-portraits">{membersByMultiplier[multiplier].map((pokemon) => <PokemonPortrait key={pokemon.id} pokemon={pokemon} description={`${MULTIPLIER_TEXT[multiplier]} damage from ${type}`} />)}</div> : <span className="visually-hidden">0</span>}</td>)}</tr>)}</tbody></table></div></div>
+        </section>
+        <section className="offensive-coverage" aria-labelledby="offensive-coverage-title"><div className="offensive-coverage-heading"><div><p className="section-kicker">THEORETICAL TYPE BASED COVERAGE</p><h3 id="offensive-coverage-title">Potential STAB targets</h3><p>Based only on the selected Pokémon's types, assuming same type attacks. This does not confirm a Pokémon knows a move.</p></div><button className="analysis-section-toggle" type="button" aria-expanded={!stabCollapsed} aria-controls="potential-stab-content" onClick={() => setStabCollapsed((collapsed) => !collapsed)}>{stabCollapsed ? 'Expand' : 'Minimize'}</button></div><div id="potential-stab-content" hidden={stabCollapsed}>
+          <div className="offensive-coverage-list">{report.offensive.map(({ type, suppliedBy, targets }) => <div key={type} className="offensive-type-row"><div><TypeBadge type={type} /><span>{suppliedBy.map((pokemon) => pokemon.name).join(', ')}</span></div><div className="effectiveness-types">{targets.length ? targets.map((target) => <TypeBadge key={target} type={target} />) : <span className="neutral-note">No super-effective single type targets</span>}</div></div>)}</div></div></section>
+        <section className="coverage-section offensive-matchup-section" aria-labelledby="offensive-matchup-title"><div className="coverage-section-heading"><div><p className="section-kicker">ATTACKING COVERAGE</p><h3 id="offensive-matchup-title">Team Offense by Defending Type</h3><p>Portraits show team members with a same-type attack that is super effective against that single defending type.</p></div><button className="analysis-section-toggle" type="button" aria-expanded={!offenseCollapsed} aria-controls="team-offense-content" onClick={() => setOffenseCollapsed((collapsed) => !collapsed)}>{offenseCollapsed ? 'Expand table' : 'Minimize table'}</button></div>
+          <div id="team-offense-content" hidden={offenseCollapsed}><div className="coverage-table-wrap"><table className="coverage-table offensive-matchup-table"><caption>Multiplier is type effectiveness only; the usual STAB damage bonus, abilities, and movesets are not included. No portrait means the team has no same-type super-effective attack against that single defending type.</caption><thead><tr><th scope="col">Defending type</th><th scope="col">2× type effectiveness via STAB</th></tr></thead><tbody>{report.offensiveByDefendingType.map(({ type, coveredBy }) => <tr key={type}><th scope="row"><TypeBadge type={type} /></th><td className="multiplier-2">{coveredBy.length ? <div className="offensive-coverage-portraits">{coveredBy.map(({ pokemon, attackingTypes }) => <PokemonPortrait key={pokemon.id} pokemon={pokemon} description={`${attackingTypes.join(' and ')} type attack, 2× type effectiveness`} />)}</div> : <span className="visually-hidden">No super-effective same-type attacks</span>}</td></tr>)}</tbody></table></div></div>
+        </section>
         <section className="individual-analysis" aria-labelledby="individual-analysis-title"><div className="section-divider"><h3 id="individual-analysis-title">Individual matchups</h3><p>Expand a team member for its full defensive type chart.</p></div>
           {roster.map((pokemon) => { const effectiveness = analyzePokemon(pokemon); return <details className="individual-pokemon-analysis" key={pokemon.id}><summary><PokemonImage pokemon={pokemon} compact /><span className="individual-summary-name">{pokemon.name}<small>#{String(pokemon.dexNumber).padStart(4, '0')}</small></span><span className="team-type-list">{pokemon.types.map((type) => <TypeBadge key={type} type={type} />)}</span><span className="summary-toggle">View matchups⌄</span></summary><div className="individual-matchups">
             <EffectivenessGroup label="Double weaknesses" multiplier={4} types={effectiveness[4]} /><EffectivenessGroup label="Weaknesses" multiplier={2} types={effectiveness[2]} /><EffectivenessGroup label="Resistances" multiplier={0.5} types={effectiveness[0.5]} /><EffectivenessGroup label="Double resistances" multiplier={0.25} types={effectiveness[0.25]} /><EffectivenessGroup label="Immunities" multiplier={0} types={effectiveness[0]} />
           </div></details>})}
         </section>
       </>}
+      </div>
     </section>
     <footer className="team-builder-footnote">Matchups use the TypeDex Generation IX type chart. Results describe type effectiveness only.</footer>
   </main>

@@ -37,6 +37,15 @@ describe('Team Builder type analysis', () => {
     expect(report.defensiveGaps.some(({ type }) => type === 'Rock')).toBe(true)
     expect(report.offensive.find(({ type }) => type === 'Fire')?.targets).toContain('Grass')
     expect(report.offensive.find(({ type }) => type === 'Water')?.suppliedBy.map(({ name }) => name)).toEqual(['Gyarados'])
+    expect(report.defensive.find(({ type }) => type === 'Electric')?.membersByMultiplier[4].map(({ name }) => name)).toEqual(['Gyarados'])
+
+    const pikachu = pokemon(25)
+    const pikachuOffense = analyzeTeam([pikachu]).offensiveByDefendingType
+    for (const type of ['Flying', 'Water'] as const) {
+      expect(pikachuOffense.find((entry) => entry.type === type)?.coveredBy).toEqual([
+        { pokemon: pikachu, attackingTypes: ['Electric'] },
+      ])
+    }
   })
 
   it('handles empty and partial teams', () => {

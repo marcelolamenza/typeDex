@@ -264,6 +264,10 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .catalog-no-results { border: 1px dashed #bbc8cb; border-radius: 12px; padding: 26px 14px; color: #637478; font-size: 12px; text-align: center; }
 .analysis-panel { background: linear-gradient(145deg, #eff1ef, #e1e6e3); }
 .analysis-heading { margin-bottom: 15px; }
+.analysis-heading-top, .coverage-section-heading, .offensive-coverage-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.analysis-section-toggle { flex: 0 0 auto; min-height: 32px; border: 1px solid #bac8cb; border-radius: 999px; background: #f9fbfb; padding: 6px 11px; color: #465a5e; font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
+.analysis-section-toggle:hover { border-color: #85989c; background: #fff; }
+.analysis-section-toggle:focus-visible { outline: 3px solid #6d858a; outline-offset: 2px; }
 .analysis-heading .section-kicker { margin-bottom: 4px; }
 .analysis-heading h2 { margin-bottom: 5px; }
 .analysis-heading > p:last-child, .offensive-coverage > div:first-child > p:last-child { margin: 0; color: #6d7b7c; font-size: 11px; line-height: 1.5; }
@@ -297,8 +301,21 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .coverage-table td.multiplier-0-5 { color: #35804c; }
 .coverage-table td.multiplier-2 { color: #c2473f; }
 .coverage-table td.multiplier-4 { color: #a93239; }
+.coverage-section { margin: 12px 0 18px; }
+.coverage-section-heading { align-items: center; margin: 0 0 8px; }
+.coverage-section-heading .section-kicker { margin-bottom: 3px; }
+.coverage-section-heading h3 { margin: 0 0 3px; color: #45575a; font-size: 15px; }
+.coverage-section-heading p:last-child { margin: 0; color: #6d7b7c; font-size: 10px; line-height: 1.45; }
+.coverage-portraits, .offensive-coverage-portraits { display: flex; min-width: 36px; min-height: 32px; align-items: center; justify-content: center; flex-wrap: wrap; gap: 3px; }
+.coverage-portrait { display: inline-grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; overflow: hidden; border: 1px solid #d0d9da; border-radius: 50%; background: radial-gradient(circle, #fff 0 47%, #e5ebed 49% 64%, #d6dfe0 66%); color: #52676b; font-size: 12px; font-weight: 850; line-height: 1; }
+.coverage-portrait img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.coverage-table td { min-width: 43px; padding: 4px 3px; }
+.coverage-table .coverage-portraits { margin: 0 auto; }
+.offensive-matchup-section .coverage-table th:last-child { min-width: 200px; }
+.offensive-coverage-portraits { justify-content: flex-start; }
 .offensive-coverage { border: 1px solid #ccd8de; border-radius: 14px; background: linear-gradient(145deg, #eff5f8, #e4edf1); padding: 14px; }
-.offensive-coverage > div:first-child .section-kicker { margin-bottom: 4px; }
+.offensive-coverage-heading .section-kicker { margin-bottom: 4px; }
+.offensive-coverage-heading { align-items: center; }
 .offensive-coverage h3 { margin-bottom: 4px; font-size: 16px; }
 .offensive-coverage-list { display: grid; gap: 6px; margin-top: 12px; }
 .offensive-type-row { display: grid; grid-template-columns: minmax(130px, .8fr) 2fr; gap: 10px; align-items: start; border-top: 1px solid #d6e0e3; padding-top: 7px; }
@@ -368,6 +385,11 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
   .catalog-pokemon-card .pokemon-art { width: 54px; height: 54px; flex-basis: 54px; }
   .report-highlights { grid-template-columns: 1fr; }
   .report-card li > span:last-child { flex-basis: auto; }
+  .analysis-heading-top, .coverage-section-heading, .offensive-coverage-heading { gap: 7px; }
+  .analysis-section-toggle { min-height: 30px; padding: 5px 8px; font-size: 9px; }
+  .coverage-section-heading h3 { font-size: 13px; }
+  .coverage-section-heading > div { min-width: 0; }
+  .offensive-matchup-section .coverage-table th:last-child { min-width: 185px; }
   .coverage-table { min-width: 485px; }
   .offensive-type-row { grid-template-columns: 1fr; gap: 5px; }
   .individual-pokemon-analysis summary { gap: 6px; flex-wrap: wrap; }
