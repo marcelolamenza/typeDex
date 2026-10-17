@@ -262,7 +262,8 @@ h2 { font-size: 20px; letter-spacing: -.4px; margin: 0; }
 .load-more-button { display: block; margin: 15px auto 0; border: 1px solid #bac8cb; border-radius: 999px; background: #f9fbfb; padding: 10px 17px; color: #465a5e; font-size: 11px; font-weight: 800; cursor: pointer; }
 .load-more-button span { color: #7d8b8f; font-weight: 600; }
 .catalog-no-results { border: 1px dashed #bbc8cb; border-radius: 12px; padding: 26px 14px; color: #637478; font-size: 12px; text-align: center; }
-.analysis-panel { background: linear-gradient(145deg, #eff1ef, #e1e6e3); }
+.analysis-panel { background: linear-gradient(145deg, #f6e7e5, #edd3d1); }
+.analysis-panel.offensive-profile { background: linear-gradient(145deg, #d4e5f2, #b8d1e3); }
 .analysis-heading { margin-bottom: 15px; }
 .analysis-heading-top, .coverage-section-heading, .offensive-coverage-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .analysis-section-toggle { flex: 0 0 auto; min-height: 32px; border: 1px solid #bac8cb; border-radius: 999px; background: #f9fbfb; padding: 6px 11px; color: #465a5e; font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
