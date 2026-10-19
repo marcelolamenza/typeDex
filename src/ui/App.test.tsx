@@ -7,7 +7,7 @@ import './styles.css'
 
 describe('visual type lookup', () => {
   beforeEach(() => {
-    window.history.replaceState(null, '', window.location.href)
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
   })
 
   it('shows all current types as accessible icon buttons with local official artwork', () => {
@@ -30,6 +30,7 @@ describe('visual type lookup', () => {
 
     const offense = screen.getByRole('region', { name: 'Attacking' })
     expect(offense).toHaveClass('offense-card')
+    expect(screen.queryByText(/Cycles for/)).not.toBeInTheDocument()
     expect(within(offense).getByText('Grass', { selector: '.type-result-name' })).toBeInTheDocument()
     expect(offense.querySelector('.count-badge')).toBeNull()
     const matchupSections = Array.from(document.querySelectorAll('.matchup-columns > section'))
@@ -93,26 +94,38 @@ describe('visual type lookup', () => {
     expect(screen.queryByText(/weakness|resistance|immunity/i)).not.toBeInTheDocument()
   })
 
-  it('shows selected-type cycles as icon triangles and squares below team-up', async () => {
+  it('opens the separate cycle browser with only type-icon triangles', async () => {
     const user = userEvent.setup()
     render(<App />)
+    await user.click(screen.getByRole('link', { name: /Explore Type Advantage Cycles/ }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Find a three-type cycle.' })).toBeInTheDocument())
     await user.click(screen.getByRole('button', { name: 'Ice type' }))
 
     const cycleSection = screen.getByRole('region', { name: 'Cycles for Ice' })
     expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' })).toBeInTheDocument()
-    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Flying beats Fighting beats Steel beats Ice' })).toBeInTheDocument()
+    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Flying beats Fighting beats Ice' })).toBeInTheDocument()
     expect(cycleSection.querySelectorAll('.cycle-triangle')).toHaveLength(5)
-    expect(cycleSection.querySelectorAll('.cycle-square')).toHaveLength(12)
-    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Grass beats Water beats Fire beats Ice' })).toBeInTheDocument()
-    expect(cycleSection.querySelector('.cycle-square .cycle-connectors')?.querySelectorAll('path:not(marker path)')).toHaveLength(4)
+    expect(cycleSection.querySelectorAll('.cycle-square')).toHaveLength(0)
+    expect(within(cycleSection).queryByRole('img', { name: /beats .+ beats .+ beats .+ beats/ })).not.toBeInTheDocument()
     expect(cycleSection.querySelector('.cycle-node')).toHaveStyle({ borderRadius: '50%' })
-    expect(within(cycleSection).queryByText(/^Cycle \d+$/)).not.toBeInTheDocument()
-    expect(document.querySelector('.type-cycle-section')?.previousElementSibling).toHaveClass('dual-card')
-    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' }).querySelectorAll('.cycle-node img')).toHaveLength(3)
-    const minimizeCycles = within(cycleSection).getByRole('button', { name: 'Minimize cycles' })
+    await user.click(screen.getByRole('button', { name: 'Fire type' }))
+    expect(screen.getByRole('img', { name: 'Fire beats Grass beats Water beats Fire' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Ice type' }))
+    const refreshedCycleSection = screen.getByRole('region', { name: 'Cycles for Ice' })
+    expect(within(refreshedCycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' }).querySelectorAll('.cycle-node img')).toHaveLength(3)
+    const minimizeCycles = within(refreshedCycleSection).getByRole('button', { name: 'Minimize cycles' })
     await user.click(minimizeCycles)
-    expect(within(cycleSection).getByRole('button', { name: 'Expand cycles' })).toHaveAttribute('aria-expanded', 'false')
-    expect(cycleSection.querySelector('#type-cycle-content')).toHaveAttribute('hidden')
+    expect(within(refreshedCycleSection).getByRole('button', { name: 'Expand cycles' })).toHaveAttribute('aria-expanded', 'false')
+    expect(refreshedCycleSection.querySelector('#type-cycle-content')).toHaveAttribute('hidden')
+    await user.click(within(screen.getByRole('navigation', { name: 'Main navigation' })).getByRole('link', { name: 'Type Checker' }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Choose your type.' })).toBeInTheDocument())
+  })
+
+  it('supports opening the cycle browser directly from its hash route', () => {
+    window.history.replaceState(null, '', '#/cycles')
+    render(<App />)
+    expect(screen.getByRole('heading', { name: 'Find a three-type cycle.' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Main navigation' })).toHaveTextContent('Type CheckerTeam Builder')
   })
 
   it('returns to the icon index with the back control', async () => {

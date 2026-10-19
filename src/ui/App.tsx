@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { getMultiplier, getOffensiveMatchups } from '../domain/effectiveness'
 import { POKEMON_TYPES, type Multiplier, type PokemonType } from '../domain/types'
-import { getTypeCycles } from '../domain/typeCycles'
+import TypeIcon from './TypeIcon'
 
 const TeamBuilder = lazy(() => import('../features/team-builder/TeamBuilder'))
+const TypeCyclesPage = lazy(() => import('./TypeCyclesPage'))
 
 const MULTIPLIER_LABEL: Record<Multiplier, string> = {
   0: '0×', 0.25: '¼×', 0.5: '½×', 1: '1×', 2: '2×', 4: '4×',
@@ -14,12 +15,6 @@ function multiplierClass(multiplier: Multiplier) {
 }
 
 const MULTIPLIER_ORDER: readonly Multiplier[] = [4, 2, 0.5, 0.25, 0]
-
-function TypeIcon({ type, size = 'normal' }: { type: PokemonType; size?: 'normal' | 'large' }) {
-  return <span className={`type-icon ${size}`} aria-hidden="true">
-    <img src={`${import.meta.env.BASE_URL}type-icons/${type.toLowerCase()}.svg`} alt="" />
-  </span>
-}
 
 function typeFromHistoryState(state: unknown): PokemonType | null {
   if (typeof state !== 'object' || state === null || !('typeDex' in state)) return null
@@ -69,33 +64,9 @@ function MultiplierRows({ matchups, label }: {
   </div>
 }
 
-function TypeCycleCard({ cycle }: { cycle: PokemonType[] }) {
-  const cycleDescription = `${cycle.join(' beats ')} beats ${cycle[0]}`
-  const positions = cycle.length === 3 ? 'triangle' : 'square'
-  const markerId = `cycle-arrowhead-${cycle.join('-').toLowerCase()}`
-  return <li className="type-cycle-list-item">
-    <article className={`type-cycle-card cycle-${positions}`}>
-      <div className={`cycle-visual cycle-visual-${positions}`} role="img" aria-label={cycleDescription}>
-        <svg className="cycle-connectors" viewBox="0 0 235 168" aria-hidden="true">
-          <defs><marker id={markerId} markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3.5 L0,7 Z" /></marker></defs>
-          {(positions === 'triangle'
-            ? ['M145 55 L166 103', 'M159 130 L76 130', 'M69 103 L90 55']
-            : ['M145 51 L164 66', 'M164 102 L145 119', 'M90 119 L71 102', 'M71 66 L90 51']
-          ).map((path, pathIndex) => <path key={pathIndex} d={path} markerEnd={`url(#${markerId})`} />)}
-        </svg>
-        {cycle.map((type, nodeIndex) => <span key={type} className={`cycle-node cycle-node-${nodeIndex}`}>
-          <TypeIcon type={type} />
-          <span>{type}</span>
-        </span>)}
-      </div>
-    </article>
-  </li>
-}
-
 function TypeDexPage() {
   const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
   const [partnerType, setPartnerType] = useState<PokemonType | null>(null)
-  const [cyclesCollapsed, setCyclesCollapsed] = useState(false)
 
   useEffect(() => {
     function handlePopState(event: PopStateEvent) {
@@ -126,7 +97,6 @@ function TypeDexPage() {
   }
 
   const offense = selectedType ? getOffensiveMatchups(selectedType) : []
-  const typeCycles = selectedType ? getTypeCycles(selectedType) : []
   const singleDefense = selectedType
     ? POKEMON_TYPES.map((attackingType) => ({
       type: attackingType,
@@ -149,9 +119,16 @@ function TypeDexPage() {
     </header>
 
     {!selectedType ? <section className="type-index" aria-labelledby="index-title">
-      <div className="intro">
-        <p className="eyebrow"><span className="eyebrow-ball" aria-hidden="true" /> THE BATTLE REFERENCE</p>
-        <h1 id="index-title">Choose your <span>type.</span></h1>
+      <div className="type-index-heading">
+        <div className="intro">
+          <p className="eyebrow"><span className="eyebrow-ball" aria-hidden="true" /> THE BATTLE REFERENCE</p>
+          <h1 id="index-title">Choose your <span>type.</span></h1>
+        </div>
+        <a className="cycles-launch-card" href="#/cycles" aria-label="Explore Type Advantage Cycles, find three-type matchup loops">
+          <span className="cycles-launch-icons" aria-hidden="true"><TypeIcon type="Fire" /><TypeIcon type="Grass" /><TypeIcon type="Water" /></span>
+          <span className="cycles-launch-copy"><strong>Type Advantage Cycles</strong><span>Explore three-type loops</span></span>
+          <span className="cycles-launch-arrow" aria-hidden="true">↗</span>
+        </a>
       </div>
       <div className="type-grid" aria-label="All Pokémon types">
         {POKEMON_TYPES.map((type) => <TypeTile key={type} type={type} onClick={() => openType(type)} />)}
@@ -213,31 +190,22 @@ function TypeDexPage() {
         </div>}
       </section>
 
-      <section className="type-cycle-section" aria-labelledby="type-cycle-section-title">
-        <div className="type-cycle-section-heading">
-          <div><p className="section-kicker">TYPE ADVANTAGE FLOW</p><h2 id="type-cycle-section-title">Cycles for {selectedType}</h2>
-            <p>Each arrow points to a type the previous type beats. Cycles use all available types and contain 3 or 4 types.</p>
-          </div>
-          <button className="analysis-section-toggle" type="button" aria-expanded={!cyclesCollapsed} aria-controls="type-cycle-content" onClick={() => setCyclesCollapsed((collapsed) => !collapsed)}>{cyclesCollapsed ? 'Expand cycles' : 'Minimize cycles'}</button>
-        </div>
-        <div id="type-cycle-content" hidden={cyclesCollapsed}>
-          {typeCycles.length > 0
-            ? <ol className="type-cycle-list">{typeCycles.map((cycle) => <TypeCycleCard key={cycle.join('-')} cycle={cycle} />)}</ol>
-            : <p className="type-cycle-empty">No 3- or 4-type cycles match {selectedType}.</p>}
-        </div>
-      </section>
     </section>}
   </main>
 }
 
 export default function App() {
-  const [teamBuilder, setTeamBuilder] = useState(window.location.hash === '#/team-builder')
+  const [route, setRoute] = useState(window.location.hash)
   useEffect(() => {
-    const onRouteChange = () => setTeamBuilder(window.location.hash === '#/team-builder')
+    const onRouteChange = () => setRoute(window.location.hash)
     window.addEventListener('hashchange', onRouteChange)
     return () => window.removeEventListener('hashchange', onRouteChange)
   }, [])
-  return teamBuilder
-    ? <Suspense fallback={<main className="page-shell"><p className="loading-state" role="status">Loading Team Builder…</p></main>}><TeamBuilder /></Suspense>
-    : <TypeDexPage />
+  if (route === '#/team-builder') {
+    return <Suspense fallback={<main className="page-shell"><p className="loading-state" role="status">Loading Team Builder…</p></main>}><TeamBuilder /></Suspense>
+  }
+  if (route === '#/cycles') {
+    return <Suspense fallback={<main className="page-shell"><p className="loading-state" role="status">Loading type cycles…</p></main>}><TypeCyclesPage /></Suspense>
+  }
+  return <TypeDexPage />
 }
