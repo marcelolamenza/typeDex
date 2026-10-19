@@ -93,6 +93,21 @@ describe('visual type lookup', () => {
     expect(screen.queryByText(/weakness|resistance|immunity/i)).not.toBeInTheDocument()
   })
 
+  it('shows selected-type cycles as icon triangles and squares below team-up', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByRole('button', { name: 'Ice type' }))
+
+    const cycleSection = screen.getByRole('region', { name: 'Cycles for Ice' })
+    expect(within(cycleSection).getByText('6 cycles')).toBeInTheDocument()
+    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' })).toBeInTheDocument()
+    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Flying beats Fighting beats Steel beats Ice' })).toBeInTheDocument()
+    expect(cycleSection.querySelectorAll('.cycle-triangle')).toHaveLength(3)
+    expect(cycleSection.querySelectorAll('.cycle-square')).toHaveLength(3)
+    expect(document.querySelector('.type-cycle-section')?.previousElementSibling).toHaveClass('dual-card')
+    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' }).querySelectorAll('.cycle-node img')).toHaveLength(3)
+  })
+
   it('returns to the icon index with the back control', async () => {
     const user = userEvent.setup()
     render(<App />)

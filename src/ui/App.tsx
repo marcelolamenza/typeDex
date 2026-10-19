@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { getMultiplier, getOffensiveMatchups } from '../domain/effectiveness'
 import { POKEMON_TYPES, type Multiplier, type PokemonType } from '../domain/types'
+import { getTypeCycles } from '../domain/typeCycles'
 
 const TeamBuilder = lazy(() => import('../features/team-builder/TeamBuilder'))
 
@@ -68,6 +69,23 @@ function MultiplierRows({ matchups, label }: {
   </div>
 }
 
+function TypeCycleCard({ cycle, index }: { cycle: PokemonType[]; index: number }) {
+  const cycleDescription = `${cycle.join(' beats ')} beats ${cycle[0]}`
+  const positions = cycle.length === 3 ? 'triangle' : 'square'
+  return <li className="type-cycle-list-item">
+    <article className={`type-cycle-card cycle-${positions}`} aria-labelledby={`type-cycle-${index}-title`}>
+      <h3 id={`type-cycle-${index}-title`} className="type-cycle-number">Cycle {index + 1}</h3>
+      <div className={`cycle-visual cycle-visual-${positions}`} role="img" aria-label={cycleDescription}>
+        {cycle.map((type, nodeIndex) => <span key={type} className={`cycle-node cycle-node-${nodeIndex}`}>
+          <TypeIcon type={type} />
+          <span>{type}</span>
+        </span>)}
+        {cycle.map((_, arrowIndex) => <span key={arrowIndex} className={`cycle-arrow cycle-arrow-${arrowIndex}`} aria-hidden="true">➜</span>)}
+      </div>
+    </article>
+  </li>
+}
+
 function TypeDexPage() {
   const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
   const [partnerType, setPartnerType] = useState<PokemonType | null>(null)
@@ -101,6 +119,7 @@ function TypeDexPage() {
   }
 
   const offense = selectedType ? getOffensiveMatchups(selectedType) : []
+  const typeCycles = selectedType ? getTypeCycles(selectedType) : []
   const singleDefense = selectedType
     ? POKEMON_TYPES.map((attackingType) => ({
       type: attackingType,
@@ -185,6 +204,18 @@ function TypeDexPage() {
         {partnerType && <div className="dual-results">
           <MultiplierRows matchups={dualDefense} label={`${selectedType} and ${partnerType} combined defensive matchups`} />
         </div>}
+      </section>
+
+      <section className="type-cycle-section" aria-labelledby="type-cycle-section-title">
+        <div className="type-cycle-section-heading">
+          <div><p className="section-kicker">TYPE ADVANTAGE FLOW</p><h2 id="type-cycle-section-title">Cycles for {selectedType}</h2>
+            <p>Each arrow points to a type the previous type beats. Cycles are 3 or 4 types and exclude Fire, Grass, and Water.</p>
+          </div>
+          <span className="type-cycle-count">{typeCycles.length} {typeCycles.length === 1 ? 'cycle' : 'cycles'}</span>
+        </div>
+        {typeCycles.length > 0
+          ? <ol className="type-cycle-list">{typeCycles.map((cycle, index) => <TypeCycleCard key={cycle.join('-')} cycle={cycle} index={index} />)}</ol>
+          : <p className="type-cycle-empty">No 3- or 4-type cycles match {selectedType} with Fire, Grass, and Water excluded.</p>}
       </section>
     </section>}
   </main>
