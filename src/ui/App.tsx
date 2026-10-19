@@ -209,13 +209,13 @@ function TypeDexPage() {
       <section className="type-cycle-section" aria-labelledby="type-cycle-section-title">
         <div className="type-cycle-section-heading">
           <div><p className="section-kicker">TYPE ADVANTAGE FLOW</p><h2 id="type-cycle-section-title">Cycles for {selectedType}</h2>
-            <p>Each arrow points to a type the previous type beats. Cycles are 3 or 4 types and exclude Fire, Grass, and Water.</p>
+            <p>Each arrow points to a type the previous type beats. Cycles use all available types and contain 3 or 4 types.</p>
           </div>
           <span className="type-cycle-count">{typeCycles.length} {typeCycles.length === 1 ? 'cycle' : 'cycles'}</span>
         </div>
         {typeCycles.length > 0
           ? <ol className="type-cycle-list">{typeCycles.map((cycle, index) => <TypeCycleCard key={cycle.join('-')} cycle={cycle} index={index} />)}</ol>
-          : <p className="type-cycle-empty">No 3- or 4-type cycles match {selectedType} with Fire, Grass, and Water excluded.</p>}
+          : <p className="type-cycle-empty">No 3- or 4-type cycles match {selectedType}.</p>}
       </section>
     </section>}
   </main>

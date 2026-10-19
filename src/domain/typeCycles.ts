@@ -2,17 +2,15 @@ import { getMultiplier } from './effectiveness'
 import { getTypesForGeneration } from '../data/typeCharts'
 import type { Generation, PokemonType } from './types'
 
-const EXCLUDED_TYPES = new Set<PokemonType>(['Fire', 'Grass', 'Water'])
-
 /**
  * Finds directed 3- and 4-type super-effective cycles containing `selectedType`.
- * Fire, Grass, and Water are excluded to match the cycle set requested in TypeDex.
+ * Uses every type available in the requested generation's TypeDex chart.
  */
 export function getTypeCycles(selectedType: PokemonType, generation: Generation = 9): PokemonType[][] {
   const generationTypes = getTypesForGeneration(generation)
-  if (!generationTypes.includes(selectedType) || EXCLUDED_TYPES.has(selectedType)) return []
+  if (!generationTypes.includes(selectedType)) return []
 
-  const candidates = generationTypes.filter((type) => !EXCLUDED_TYPES.has(type))
+  const candidates = generationTypes
   const cycles: PokemonType[][] = []
 
   function extend(path: PokemonType[]) {
