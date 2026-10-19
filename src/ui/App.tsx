@@ -69,18 +69,24 @@ function MultiplierRows({ matchups, label }: {
   </div>
 }
 
-function TypeCycleCard({ cycle, index }: { cycle: PokemonType[]; index: number }) {
+function TypeCycleCard({ cycle }: { cycle: PokemonType[] }) {
   const cycleDescription = `${cycle.join(' beats ')} beats ${cycle[0]}`
   const positions = cycle.length === 3 ? 'triangle' : 'square'
+  const markerId = `cycle-arrowhead-${cycle.join('-').toLowerCase()}`
   return <li className="type-cycle-list-item">
-    <article className={`type-cycle-card cycle-${positions}`} aria-labelledby={`type-cycle-${index}-title`}>
-      <h3 id={`type-cycle-${index}-title`} className="type-cycle-number">Cycle {index + 1}</h3>
+    <article className={`type-cycle-card cycle-${positions}`}>
       <div className={`cycle-visual cycle-visual-${positions}`} role="img" aria-label={cycleDescription}>
+        <svg className="cycle-connectors" viewBox="0 0 235 168" aria-hidden="true">
+          <defs><marker id={markerId} markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3.5 L0,7 Z" /></marker></defs>
+          {(positions === 'triangle'
+            ? ['M145 55 L166 103', 'M159 130 L76 130', 'M69 103 L90 55']
+            : ['M145 51 L164 66', 'M164 102 L145 119', 'M90 119 L71 102', 'M71 66 L90 51']
+          ).map((path, pathIndex) => <path key={pathIndex} d={path} markerEnd={`url(#${markerId})`} />)}
+        </svg>
         {cycle.map((type, nodeIndex) => <span key={type} className={`cycle-node cycle-node-${nodeIndex}`}>
           <TypeIcon type={type} />
           <span>{type}</span>
         </span>)}
-        {cycle.map((_, arrowIndex) => <span key={arrowIndex} className={`cycle-arrow cycle-arrow-${arrowIndex}`} aria-hidden="true">➜</span>)}
       </div>
     </article>
   </li>
@@ -89,6 +95,7 @@ function TypeCycleCard({ cycle, index }: { cycle: PokemonType[]; index: number }
 function TypeDexPage() {
   const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
   const [partnerType, setPartnerType] = useState<PokemonType | null>(null)
+  const [cyclesCollapsed, setCyclesCollapsed] = useState(false)
 
   useEffect(() => {
     function handlePopState(event: PopStateEvent) {
@@ -211,11 +218,13 @@ function TypeDexPage() {
           <div><p className="section-kicker">TYPE ADVANTAGE FLOW</p><h2 id="type-cycle-section-title">Cycles for {selectedType}</h2>
             <p>Each arrow points to a type the previous type beats. Cycles use all available types and contain 3 or 4 types.</p>
           </div>
-          <span className="type-cycle-count">{typeCycles.length} {typeCycles.length === 1 ? 'cycle' : 'cycles'}</span>
+          <button className="analysis-section-toggle" type="button" aria-expanded={!cyclesCollapsed} aria-controls="type-cycle-content" onClick={() => setCyclesCollapsed((collapsed) => !collapsed)}>{cyclesCollapsed ? 'Expand cycles' : 'Minimize cycles'}</button>
         </div>
-        {typeCycles.length > 0
-          ? <ol className="type-cycle-list">{typeCycles.map((cycle, index) => <TypeCycleCard key={cycle.join('-')} cycle={cycle} index={index} />)}</ol>
-          : <p className="type-cycle-empty">No 3- or 4-type cycles match {selectedType}.</p>}
+        <div id="type-cycle-content" hidden={cyclesCollapsed}>
+          {typeCycles.length > 0
+            ? <ol className="type-cycle-list">{typeCycles.map((cycle) => <TypeCycleCard key={cycle.join('-')} cycle={cycle} />)}</ol>
+            : <p className="type-cycle-empty">No 3- or 4-type cycles match {selectedType}.</p>}
+        </div>
       </section>
     </section>}
   </main>

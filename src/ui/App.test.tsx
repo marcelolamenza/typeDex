@@ -99,14 +99,20 @@ describe('visual type lookup', () => {
     await user.click(screen.getByRole('button', { name: 'Ice type' }))
 
     const cycleSection = screen.getByRole('region', { name: 'Cycles for Ice' })
-    expect(within(cycleSection).getByText('17 cycles')).toBeInTheDocument()
     expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' })).toBeInTheDocument()
     expect(within(cycleSection).getByRole('img', { name: 'Ice beats Flying beats Fighting beats Steel beats Ice' })).toBeInTheDocument()
     expect(cycleSection.querySelectorAll('.cycle-triangle')).toHaveLength(5)
     expect(cycleSection.querySelectorAll('.cycle-square')).toHaveLength(12)
     expect(within(cycleSection).getByRole('img', { name: 'Ice beats Grass beats Water beats Fire beats Ice' })).toBeInTheDocument()
+    expect(cycleSection.querySelector('.cycle-square .cycle-connectors')?.querySelectorAll('path:not(marker path)')).toHaveLength(4)
+    expect(cycleSection.querySelector('.cycle-node')).toHaveStyle({ borderRadius: '50%' })
+    expect(within(cycleSection).queryByText(/^Cycle \d+$/)).not.toBeInTheDocument()
     expect(document.querySelector('.type-cycle-section')?.previousElementSibling).toHaveClass('dual-card')
     expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' }).querySelectorAll('.cycle-node img')).toHaveLength(3)
+    const minimizeCycles = within(cycleSection).getByRole('button', { name: 'Minimize cycles' })
+    await user.click(minimizeCycles)
+    expect(within(cycleSection).getByRole('button', { name: 'Expand cycles' })).toHaveAttribute('aria-expanded', 'false')
+    expect(cycleSection.querySelector('#type-cycle-content')).toHaveAttribute('hidden')
   })
 
   it('returns to the icon index with the back control', async () => {
