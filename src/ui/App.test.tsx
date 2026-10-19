@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { POKEMON_TYPES } from '../domain/types'
+import { getAllTypeCycles } from '../domain/typeCycles'
 import App from './App'
 import './styles.css'
 
@@ -21,6 +22,7 @@ describe('visual type lookup', () => {
       )
     }
     expect(screen.queryByLabelText('Ruleset')).not.toBeInTheDocument()
+    expect(document.querySelector('.type-grid')?.nextElementSibling).toHaveClass('cycles-launch-card')
   })
 
   it('separates offense and defense and groups only changed defensive multipliers into rows', async () => {
@@ -94,37 +96,31 @@ describe('visual type lookup', () => {
     expect(screen.queryByText(/weakness|resistance|immunity/i)).not.toBeInTheDocument()
   })
 
-  it('opens the separate cycle browser with only type-icon triangles', async () => {
+  it('opens the separate cycle browser with every three-type cycle immediately visible', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('link', { name: /Explore Type Advantage Cycles/ }))
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Find a three-type cycle.' })).toBeInTheDocument())
-    await user.click(screen.getByRole('button', { name: 'Ice type' }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Three-type cycles.' })).toBeInTheDocument())
 
-    const cycleSection = screen.getByRole('region', { name: 'Cycles for Ice' })
-    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' })).toBeInTheDocument()
-    expect(within(cycleSection).getByRole('img', { name: 'Ice beats Flying beats Fighting beats Ice' })).toBeInTheDocument()
-    expect(cycleSection.querySelectorAll('.cycle-triangle')).toHaveLength(5)
+    const cycleSection = screen.getByRole('region', { name: 'Every three-type cycle' })
+    expect(cycleSection.querySelectorAll('.cycle-triangle')).toHaveLength(getAllTypeCycles().length)
     expect(cycleSection.querySelectorAll('.cycle-square')).toHaveLength(0)
-    expect(within(cycleSection).queryByRole('img', { name: /beats .+ beats .+ beats .+ beats/ })).not.toBeInTheDocument()
+    expect(within(cycleSection).getByRole('img', { name: 'Fire beats Grass beats Water beats Fire' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Ice type' })).not.toBeInTheDocument()
     expect(cycleSection.querySelector('.cycle-node')).toHaveStyle({ borderRadius: '50%' })
-    await user.click(screen.getByRole('button', { name: 'Fire type' }))
-    expect(screen.getByRole('img', { name: 'Fire beats Grass beats Water beats Fire' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Ice type' }))
-    const refreshedCycleSection = screen.getByRole('region', { name: 'Cycles for Ice' })
-    expect(within(refreshedCycleSection).getByRole('img', { name: 'Ice beats Ground beats Rock beats Ice' }).querySelectorAll('.cycle-node img')).toHaveLength(3)
-    const minimizeCycles = within(refreshedCycleSection).getByRole('button', { name: 'Minimize cycles' })
+    const minimizeCycles = within(cycleSection).getByRole('button', { name: 'Minimize cycles' })
     await user.click(minimizeCycles)
-    expect(within(refreshedCycleSection).getByRole('button', { name: 'Expand cycles' })).toHaveAttribute('aria-expanded', 'false')
-    expect(refreshedCycleSection.querySelector('#type-cycle-content')).toHaveAttribute('hidden')
+    expect(within(cycleSection).getByRole('button', { name: 'Expand cycles' })).toHaveAttribute('aria-expanded', 'false')
+    expect(cycleSection.querySelector('#type-cycle-content')).toHaveAttribute('hidden')
     await user.click(within(screen.getByRole('navigation', { name: 'Main navigation' })).getByRole('link', { name: 'Type Checker' }))
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Choose your type.' })).toBeInTheDocument())
   })
 
-  it('supports opening the cycle browser directly from its hash route', () => {
+  it('supports opening the all-cycles browser directly from its hash route', () => {
     window.history.replaceState(null, '', '#/cycles')
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Find a three-type cycle.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Three-type cycles.' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Fire beats Grass beats Water beats Fire' })).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Main navigation' })).toHaveTextContent('Type CheckerTeam Builder')
   })
 

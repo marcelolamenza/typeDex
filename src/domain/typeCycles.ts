@@ -31,3 +31,12 @@ export function getTypeCycles(selectedType: PokemonType, generation: Generation 
   extend([selectedType])
   return cycles.sort((a, b) => a.length - b.length)
 }
+
+/** Returns every directed three-type cycle once, rotated to start with its earliest chart type. */
+export function getAllTypeCycles(generation: Generation = 9): PokemonType[][] {
+  const generationTypes = getTypesForGeneration(generation)
+  const typeOrder = new Map(generationTypes.map((type, index) => [type, index]))
+
+  return generationTypes.flatMap((selectedType) => getTypeCycles(selectedType, generation)
+    .filter((cycle) => cycle.every((type) => typeOrder.get(selectedType)! <= typeOrder.get(type)!)))
+}

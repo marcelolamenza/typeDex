@@ -124,15 +124,15 @@ function TypeDexPage() {
           <p className="eyebrow"><span className="eyebrow-ball" aria-hidden="true" /> THE BATTLE REFERENCE</p>
           <h1 id="index-title">Choose your <span>type.</span></h1>
         </div>
-        <a className="cycles-launch-card" href="#/cycles" aria-label="Explore Type Advantage Cycles, find three-type matchup loops">
-          <span className="cycles-launch-icons" aria-hidden="true"><TypeIcon type="Fire" /><TypeIcon type="Grass" /><TypeIcon type="Water" /></span>
-          <span className="cycles-launch-copy"><strong>Type Advantage Cycles</strong><span>Explore three-type loops</span></span>
-          <span className="cycles-launch-arrow" aria-hidden="true">↗</span>
-        </a>
       </div>
       <div className="type-grid" aria-label="All Pokémon types">
         {POKEMON_TYPES.map((type) => <TypeTile key={type} type={type} onClick={() => openType(type)} />)}
       </div>
+      <a className="cycles-launch-card" href="#/cycles" aria-label="Explore Type Advantage Cycles, find three-type matchup loops">
+        <span className="cycles-launch-icons" aria-hidden="true"><TypeIcon type="Fire" /><TypeIcon type="Grass" /><TypeIcon type="Water" /></span>
+        <span className="cycles-launch-copy"><strong>Type Advantage Cycles</strong><span>Explore three-type loops</span></span>
+        <span className="cycles-launch-arrow" aria-hidden="true">&rarr;</span>
+      </a>
     </section> : <section className="type-detail" aria-labelledby="detail-title">
       <button type="button" className="back-button" onClick={returnToTypes}><span aria-hidden="true">←</span> All types</button>
       <div className="detail-hero">

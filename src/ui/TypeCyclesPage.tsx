@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { getTypeCycles } from '../domain/typeCycles'
-import { POKEMON_TYPES, type PokemonType } from '../domain/types'
+import { getAllTypeCycles } from '../domain/typeCycles'
+import type { PokemonType } from '../domain/types'
 import TypeIcon from './TypeIcon'
 
 function TypeCycleCard({ cycle }: { cycle: PokemonType[] }) {
@@ -23,18 +23,9 @@ function TypeCycleCard({ cycle }: { cycle: PokemonType[] }) {
   </li>
 }
 
-function TypeTile({ type, selected, onClick }: { type: PokemonType; selected: boolean; onClick: () => void }) {
-  return <button type="button" className={`type-tile ${selected ? 'selected' : ''}`} aria-pressed={selected}
-    aria-label={`${type} type`} onClick={onClick}>
-    <TypeIcon type={type} />
-    <span>{type}</span>
-  </button>
-}
-
 export default function TypeCyclesPage() {
-  const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
   const [cyclesCollapsed, setCyclesCollapsed] = useState(false)
-  const cycles = useMemo(() => selectedType ? getTypeCycles(selectedType) : [], [selectedType])
+  const cycles = useMemo(() => getAllTypeCycles(), [])
 
   return <main className="page-shell">
     <header className="topbar">
@@ -47,19 +38,15 @@ export default function TypeCyclesPage() {
     </header>
 
     <section className="cycle-browser" aria-labelledby="cycle-browser-title">
-      <a className="back-button" href="#/"><span aria-hidden="true">←</span> Type Checker</a>
+      <a className="back-button" href="#/"><span aria-hidden="true">&larr;</span> Type Checker</a>
       <div className="cycle-browser-heading">
         <p className="section-kicker">TYPE ADVANTAGE CYCLES</p>
-        <h1 id="cycle-browser-title">Find a three-type cycle.</h1>
-        <p>Choose a type to see every three-type loop it forms. Each arrow points to a type it beats.</p>
+        <h1 id="cycle-browser-title">Three-type cycles.</h1>
+        <p>Every loop in the type chart, shown once. Each arrow points to a type it beats.</p>
       </div>
-      <div className="type-grid cycle-type-grid" aria-label="Choose a type for cycles">
-        {POKEMON_TYPES.map((type) => <TypeTile key={type} type={type} selected={selectedType === type}
-          onClick={() => { setSelectedType(type); setCyclesCollapsed(false) }} />)}
-      </div>
-      {selectedType && <section className="type-cycle-section" aria-labelledby="type-cycle-section-title">
+      <section className="type-cycle-section" aria-labelledby="type-cycle-section-title">
         <div className="type-cycle-section-heading">
-          <div><p className="section-kicker">THREE-TYPE LOOPS</p><h2 id="type-cycle-section-title">Cycles for {selectedType}</h2></div>
+          <div><p className="section-kicker">ALL TYPE ADVANTAGE LOOPS</p><h2 id="type-cycle-section-title">Every three-type cycle</h2></div>
           <button className="analysis-section-toggle" type="button" aria-expanded={!cyclesCollapsed} aria-controls="type-cycle-content"
             onClick={() => setCyclesCollapsed((collapsed) => !collapsed)}>
             {cyclesCollapsed ? 'Expand cycles' : 'Minimize cycles'}
@@ -68,9 +55,9 @@ export default function TypeCyclesPage() {
         <div id="type-cycle-content" hidden={cyclesCollapsed}>
           {cycles.length > 0
             ? <ol className="type-cycle-list">{cycles.map((cycle) => <TypeCycleCard key={cycle.join('-')} cycle={cycle} />)}</ol>
-            : <p className="type-cycle-empty">No three-type cycles match {selectedType}.</p>}
+            : <p className="type-cycle-empty">No three-type cycles are available.</p>}
         </div>
-      </section>}
+      </section>
     </section>
   </main>
 }
